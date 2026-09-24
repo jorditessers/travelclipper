@@ -22,6 +22,10 @@ export const Route = createFileRoute("/go/$code")({
     handlers: {
       GET: async ({ request, params }) => {
         if (!CODE.test(params.code)) return inactive();
+        // No database connected: the browser demo records the click itself.
+        if (!process.env["SUPABASE_URL"] || !process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
+          return new Response(null, { status: 302, headers: { location: `/demo-link/${params.code}`, "cache-control": "no-store" } });
+        }
         const h = request.headers;
         const ip = h.get("cf-connecting-ip") ?? h.get("x-real-ip") ?? h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

@@ -27,3 +27,16 @@ npm run dev
 - TypeScript
 - React
 - Tailwind CSS
+
+## Browser demo (no database needed)
+
+When no Supabase project is configured (`VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` not set),
+the app runs as a self-contained demo: a PostgreSQL database (PGlite) runs inside the visitor's browser,
+with the same migrations, security rules and demo data as the real platform. Nothing is sent to a server;
+every visitor gets their own copy, stored in the browser (IndexedDB).
+
+- Sign-in page: "View demo as Accommodation Partner / Distribution Partner / Platform Admin", or create any test account.
+- "Start the demo over" on the sign-in page wipes the browser's demo data.
+- Code: `src/integrations/demo-backend/` (PostgREST, Auth and Storage emulation on top of PGlite).
+
+Set the Supabase variables (and run `drizzle/migrations` on that project) to switch to a real database.

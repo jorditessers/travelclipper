@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
 import type { Database } from "@/integrations/supabase/types";
 
 export type AssetType = Database["public"]["Enums"]["asset_type"];
@@ -61,6 +62,13 @@ export const defaultAssetType = (kind: Kind): AssetType =>
 
 /** Upload via XHR so we can report progress. RLS on storage.objects still applies. */
 export async function uploadWithProgress(path: string, file: File, mime: string, onProgress: (pct: number) => void) {
+  if (isLocalDemo()) {
+    // Browser demo: the file goes into the local database (storage policies still apply).
+    const { error } = await supabase.storage.from(ASSET_BUCKET).upload(path, file, { contentType: mime, upsert: false });
+    if (error) throw new Error(error.message);
+    onProgress(100);
+    return;
+  }
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
   if (!token) throw new Error("Not signed in");
