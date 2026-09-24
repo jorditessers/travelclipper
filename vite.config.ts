@@ -12,4 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    // PGlite (the browser demo database) loads its own WebAssembly and data files.
+    optimizeDeps: { exclude: ["@electric-sql/pglite"] },
+    worker: { format: "es" },
+  },
 });

@@ -9,6 +9,7 @@ import { Card, EmptyState, KpiCard, PageHeader, Skeleton } from "@/components/ap
 import { ExcludeDemoToggle } from "@/components/admin/shared";
 import { eur } from "@/components/bookings/shared";
 import { ACCOMMODATION_STATUS_LABEL, distributionTypeLabel, type AccommodationStatus, type DistributionType } from "@/lib/constants";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
 
 export const Route = createFileRoute("/_authenticated/admin/overview")({
   validateSearch: zodValidator(z.object({ demo: fallback(z.boolean(), false).default(false) })),
@@ -53,7 +54,9 @@ function Breakdown({ title, items }: { title: string; items: [string, number][] 
 function Page() {
   const { demo } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const exclude = !demo;
+  // Browser demo: everything is demo data, so the filter starts off (the search flag then means "exclude").
+  const local = isLocalDemo();
+  const exclude = local ? demo : !demo;
   const q = useQuery({
     queryKey: ["admin-overview", exclude],
     queryFn: async () => {
@@ -67,7 +70,7 @@ function Page() {
   return (
     <div className="space-y-10">
       <PageHeader eyebrow="Admin" title="Overview" description="Platform totals and the MVP hypothesis at a glance."
-        actions={<ExcludeDemoToggle value={exclude} onChange={(v) => navigate({ search: { demo: !v }, replace: true })} />} />
+        actions={<ExcludeDemoToggle value={exclude} onChange={(v) => navigate({ search: { demo: local ? v : !v }, replace: true })} />} />
 
       {q.isLoading ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="h-28" />)}</div>
         : q.error ? <EmptyState icon={LayoutDashboard} title="Couldn't load the overview" description="We couldn't load this right now. Check your connection and try again." action={<Button variant="outline" onClick={() => q.refetch()}>Retry</Button>} />

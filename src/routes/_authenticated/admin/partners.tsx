@@ -8,6 +8,7 @@ import { DataTable, EmptyState, PageHeader, Skeleton } from "@/components/app/ui
 import { ExcludeDemoToggle, REACH_LABEL, fmtDate } from "@/components/admin/shared";
 import { eur } from "@/components/bookings/shared";
 import { distributionTypeLabel } from "@/lib/constants";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
 
 export const Route = createFileRoute("/_authenticated/admin/partners")({
   head: () => ({
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/_authenticated/admin/partners")({
 });
 
 function Page() {
-  const [exclude, setExclude] = useState(true);
+  const [exclude, setExclude] = useState(!isLocalDemo()); // browser demo: everything is demo data
   const q = useQuery({
     queryKey: ["admin-partners", exclude],
     queryFn: async () => { const { data, error } = await supabase.rpc("admin_partner_performance", { _exclude_demo: exclude }); if (error) throw error; return data; },

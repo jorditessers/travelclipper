@@ -9,6 +9,7 @@ import { Badge, DataTable, EmptyState, NativeSelect, PageHeader, Skeleton, TextI
 import { ExcludeDemoToggle, REACH_LABEL, ROLE_TEXT, fmtDate } from "@/components/admin/shared";
 import { distributionTypeLabel, marketLabel, nicheLabel } from "@/lib/constants";
 import { formatIban } from "@/lib/billing";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   head: () => ({
@@ -29,7 +30,7 @@ type UserRow = { id: string; email: string | null; first_name: string | null; la
   country: string | null; role: string | null; onboarding_completed: boolean; terms_accepted_at: string | null; is_demo: boolean; created_at: string };
 
 function Page() {
-  const [exclude, setExclude] = useState(true);
+  const [exclude, setExclude] = useState(!isLocalDemo()); // browser demo: everything is demo data
   const [term, setTerm] = useState("");
   const [role, setRole] = useState("");
   const [open, setOpen] = useState<UserRow | null>(null);

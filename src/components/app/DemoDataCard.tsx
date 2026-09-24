@@ -6,18 +6,19 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/app/ui-kit";
 import { removeDemoData, seedDemoData } from "@/lib/demo.functions";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
 
 export function DemoDataCard() {
   const qc = useQueryClient();
   const seed = useServerFn(seedDemoData);
   const remove = useServerFn(removeDemoData);
   const seedM = useMutation({
-    mutationFn: () => seed(),
+    mutationFn: async () => (isLocalDemo() ? (await import("@/integrations/demo-backend")).localSeedDemo() : seed()),
     onSuccess: (r) => { toast.success(`Demo data ready — ${r.accommodationsCreated} new stays, ${r.users} demo accounts`); qc.invalidateQueries(); },
     onError: (e: Error) => toast.error(friendlyError(e)),
   });
   const removeM = useMutation({
-    mutationFn: () => remove(),
+    mutationFn: async () => (isLocalDemo() ? (await import("@/integrations/demo-backend")).localRemoveDemo() : remove()),
     onSuccess: (r) => { toast.success(`Demo data removed (${r.usersRemoved} accounts)`); qc.invalidateQueries(); },
     onError: (e: Error) => toast.error(friendlyError(e)),
   });

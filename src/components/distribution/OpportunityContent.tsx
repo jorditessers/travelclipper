@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Download, FileText, ImageIcon, Info, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Card, EmptyState, Skeleton } from "@/components/app/ui-kit";
@@ -81,12 +82,17 @@ export function OpportunityContent({ accommodationId, name, terms, approvalRequi
   const downloadAll = async () => {
     setZipping(true);
     try {
-      const { data } = await supabase.auth.getSession();
-      const res = await fetch(`/api/opportunities/${accommodationId}/photos-zip`, {
-        headers: { Authorization: `Bearer ${data.session?.access_token ?? ""}` },
-      });
-      if (!res.ok) throw new Error((await res.text()) || "Download failed");
-      const blob = await res.blob();
+      let blob: Blob;
+      if (isLocalDemo()) {
+        blob = await zipPhotosInBrowser(accommodationId, name);
+      } else {
+        const { data } = await supabase.auth.getSession();
+        const res = await fetch(`/api/opportunities/${accommodationId}/photos-zip`, {
+          headers: { Authorization: `Bearer ${data.session?.access_token ?? ""}` },
+        });
+        if (!res.ok) throw new Error((await res.text()) || "Download failed");
+        blob = await res.blob();
+      }
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-photos.zip`;
@@ -172,4 +178,33 @@ export function OpportunityContent({ accommodationId, name, terms, approvalRequi
       </Dialog>
     </div>
   );
+}
+
+/** Browser demo: same selection and logging as the server zip endpoint, zipped in the browser. */
+async function zipPhotosInBrowser(accommodationId: string, name: string): Promise<Blob> {
+  const { zipSync } = await import("fflate");
+  const { data: assets, error } = await supabase.from("accommodation_assets")
+    .select("id, title, storage_path, external_url, sort_order")
+    .eq("accommodation_id", accommodationId).eq("approved_for_distribution", true)
+    .in("asset_type", ["photo", "drone"]).order("sort_order").limit(50);
+  if (error) throw error;
+  if (!assets.length) throw new Error("No photos available");
+  await supabase.rpc("log_event", {
+    _event_type: "content_downloaded", _accommodation_id: accommodationId,
+    _metadata: { kind: "photos_zip", asset_ids: assets.map((a) => a.id) },
+  });
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "photos";
+  const files: Record<string, Uint8Array> = {};
+  let i = 0;
+  for (const a of assets) {
+    i++;
+    let url = a.external_url;
+    if (a.storage_path) url = (await supabase.storage.from(ASSET_BUCKET).createSignedUrl(a.storage_path, 300)).data?.signedUrl ?? null;
+    if (!url) continue;
+    const res = await fetch(url).catch(() => null);
+    if (!res?.ok) continue;
+    files[`${String(i).padStart(2, "0")}-${slug}.${a.storage_path?.split(".").pop() ?? "jpg"}`] = new Uint8Array(await res.arrayBuffer());
+  }
+  if (!Object.keys(files).length) throw new Error("Download failed");
+  return new Blob([zipSync(files, { level: 0 }) as BlobPart], { type: "application/zip" });
 }

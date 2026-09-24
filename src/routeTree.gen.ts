@@ -20,6 +20,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDistributionRouteImport } from './routes/_authenticated/distribution'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as DemoLinkCodeRouteImport } from './routes/demo-link.$code'
 import { Route as GoCodeRouteImport } from './routes/go.$code'
 import { Route as AuthenticatedAccommodationIndexRouteImport } from './routes/_authenticated/accommodation/index'
 import { Route as AuthenticatedAccommodationAnalyticsRouteImport } from './routes/_authenticated/accommodation/analytics'
@@ -108,6 +109,11 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const DemoLinkCodeRoute = DemoLinkCodeRouteImport.update({
+  id: '/demo-link/$code',
+  path: '/demo-link/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const GoCodeRoute = GoCodeRouteImport.update({
   id: '/go/$code',
@@ -309,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/distribution': typeof AuthenticatedDistributionRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
+  '/demo-link/$code': typeof DemoLinkCodeRoute
   '/go/$code': typeof GoCodeRoute
   '/accommodation/analytics': typeof AuthenticatedAccommodationAnalyticsRoute
   '/accommodation/bookings': typeof AuthenticatedAccommodationBookingsRoute
@@ -350,6 +357,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
+  '/demo-link/$code': typeof DemoLinkCodeRoute
   '/go/$code': typeof GoCodeRoute
   '/accommodation/analytics': typeof AuthenticatedAccommodationAnalyticsRoute
   '/accommodation/bookings': typeof AuthenticatedAccommodationBookingsRoute
@@ -396,6 +404,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/distribution': typeof AuthenticatedDistributionRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
+  '/demo-link/$code': typeof DemoLinkCodeRoute
   '/go/$code': typeof GoCodeRoute
   '/_authenticated/accommodation/analytics': typeof AuthenticatedAccommodationAnalyticsRoute
   '/_authenticated/accommodation/bookings': typeof AuthenticatedAccommodationBookingsRoute
@@ -442,6 +451,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/distribution'
     | '/onboarding'
+    | '/demo-link/$code'
     | '/go/$code'
     | '/accommodation/analytics'
     | '/accommodation/bookings'
@@ -483,6 +493,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/dashboard'
     | '/onboarding'
+    | '/demo-link/$code'
     | '/go/$code'
     | '/accommodation/analytics'
     | '/accommodation/bookings'
@@ -528,6 +539,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/distribution'
     | '/_authenticated/onboarding'
+    | '/demo-link/$code'
     | '/go/$code'
     | '/_authenticated/accommodation/analytics'
     | '/_authenticated/accommodation/bookings'
@@ -569,6 +581,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
+  DemoLinkCodeRoute: typeof DemoLinkCodeRoute
   GoCodeRoute: typeof GoCodeRoute
   ApiOpportunitiesIdPhotosZipRoute: typeof ApiOpportunitiesIdPhotosZipRoute
 }
@@ -651,6 +664,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/demo-link/$code': {
+      id: '/demo-link/$code'
+      path: '/demo-link/$code'
+      fullPath: '/demo-link/$code'
+      preLoaderRoute: typeof DemoLinkCodeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/go/$code': {
       id: '/go/$code'
@@ -1025,6 +1045,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
+  DemoLinkCodeRoute: DemoLinkCodeRoute,
   GoCodeRoute: GoCodeRoute,
   ApiOpportunitiesIdPhotosZipRoute: ApiOpportunitiesIdPhotosZipRoute,
 }

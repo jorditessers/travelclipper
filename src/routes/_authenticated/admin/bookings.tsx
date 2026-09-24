@@ -11,6 +11,7 @@ import { eur } from "@/components/bookings/shared";
 import { friendlyError } from "@/lib/errors";
 import type { BillingDetails } from "@/lib/billing";
 import type { Database } from "@/integrations/supabase/types";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
 
 type BookingStatus = Database["public"]["Enums"]["booking_status"];
 
@@ -38,7 +39,7 @@ const billingAddress = (b: BillingDetails | null) =>
 
 function Page() {
   const qc = useQueryClient();
-  const [exclude, setExclude] = useState(true);
+  const [exclude, setExclude] = useState(!isLocalDemo()); // browser demo: everything is demo data
   const [status, setStatus] = useState("");
   const [acc, setAcc] = useState("");
   const [month, setMonth] = useState(""); // YYYY-MM by check-out

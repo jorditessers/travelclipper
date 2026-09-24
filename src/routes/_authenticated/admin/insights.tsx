@@ -10,6 +10,7 @@ import { Card, DataTable, EmptyState, Field, NativeSelect, PageHeader, Skeleton,
 import { ExcludeDemoToggle } from "@/components/admin/shared";
 import { analyzeKpiDeviation, KPI_OPTIONS, type InsightResult } from "@/lib/insights.functions";
 import { friendlyError } from "@/lib/errors";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
 
 export const Route = createFileRoute("/_authenticated/admin/insights")({
   head: () => ({
@@ -36,10 +37,11 @@ function Page() {
   const [kpi, setKpi] = useState<string>("bookings_confirmed");
   const [deviation, setDeviation] = useState<"drop" | "increase" | "unexpected">("drop");
   const [notes, setNotes] = useState("");
-  const [exclude, setExclude] = useState(true);
+  const [exclude, setExclude] = useState(!isLocalDemo()); // browser demo: everything is demo data
   const analyze = useServerFn(analyzeKpiDeviation);
   const m = useMutation({
     mutationFn: async (): Promise<Extract<InsightResult, { ok: true }>> => {
+      if (isLocalDemo()) throw new Error("AI insights need the live platform and aren't available in the browser demo.");
       const r = await analyze({ data: { from, to, kpi, deviation, context: notes, excludeDemo: exclude } });
       if (!r.ok) throw new Error(r.error);
       return r;

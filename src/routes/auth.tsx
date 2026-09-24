@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { NOT_CONFIGURED_MESSAGE, isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { GlassCard, Eyebrow } from "@/components/site/Primitives";
@@ -15,12 +16,14 @@ import { enterDemo, useDemoModeEnabled, writeTour, type DemoSide } from "@/lib/d
 function DemoEntry() {
   const enabled = useDemoModeEnabled();
   const qc = useQueryClient();
-  const [busy, setBusy] = useState<DemoSide | null>(null);
+  const [busy, setBusy] = useState<DemoSide | "admin" | null>(null);
+  const [local, setLocal] = useState(false);
+  useEffect(() => setLocal(isLocalDemo()), []);
   if (!enabled.data) return null;
-  const start = async (side: DemoSide) => {
+  const start = async (side: DemoSide | "admin") => {
     setBusy(side);
     try {
-      writeTour({ step: side === "accommodation" ? 0 : 2, open: true });
+      if (side !== "admin") writeTour({ step: side === "accommodation" ? 0 : 2, open: true });
       await enterDemo(side, qc);
       window.location.assign("/dashboard"); // full load so the demo session is picked up cleanly
     } catch (err) {
@@ -38,7 +41,24 @@ function DemoEntry() {
         <Button variant="outline" className="w-full" disabled={!!busy} onClick={() => start("distribution")}>
           {busy === "distribution" ? "Opening demo…" : "View demo as Distribution Partner"}
         </Button>
+        {local && (
+          <Button variant="outline" className="w-full" disabled={!!busy} onClick={() => start("admin")}>
+            {busy === "admin" ? "Opening demo…" : "View demo as Platform Admin"}
+          </Button>
+        )}
       </div>
+      {local && (
+        <p className="mt-4 text-center text-[12px] text-ink/50">
+          Want a clean slate?{" "}
+          <button type="button" className="underline underline-offset-2 hover:text-ink"
+            onClick={async () => {
+              if (!window.confirm("Start the demo over? Accounts and changes you made in this browser are removed and fresh demo data is loaded.")) return;
+              (await import("@/integrations/demo-backend")).resetLocalDemo();
+            }}>
+            Start the demo over
+          </button>
+        </p>
+      )}
     </div>
   );
 }
@@ -70,7 +90,11 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   // Decided in the browser only, so server and client render the same markup first.
   const [configured, setConfigured] = useState(true);
-  useEffect(() => setConfigured(isSupabaseConfigured()), []);
+  const [localDemo, setLocalDemo] = useState(false);
+  useEffect(() => {
+    setLocalDemo(isLocalDemo());
+    setConfigured(isSupabaseConfigured() || isLocalDemo());
+  }, []);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/dashboard", replace: true });
@@ -154,13 +178,23 @@ function AuthPage() {
                 {NOT_CONFIGURED_MESSAGE} Signing in and creating accounts will open soon.
               </p>
             )}
+            {localDemo && (
+              <div role="status" className="mt-6 rounded-xl bg-moss/10 px-4 py-3 text-sm text-moss">
+                <p className="font-medium">This is a demo that runs entirely in your browser.</p>
+                <p className="mt-1 text-moss/80">
+                  Explore with a demo account below, or create your own test account. Everything you do is stored only on this device.
+                </p>
+              </div>
+            )}
 
+            {!localDemo && (
             <Button variant="outline" className="mt-6 w-full" onClick={handleGoogle} disabled={busy || !configured}>
               <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
                 <path fill="currentColor" d="M21.35 11.1H12v2.9h5.35c-.25 1.5-1.7 4.4-5.35 4.4a6.4 6.4 0 1 1 0-12.8c1.85 0 3.1.8 3.8 1.45l2.6-2.5A10 10 0 1 0 12 22c5.75 0 9.55-4.05 9.55-9.75 0-.65-.05-1.15-.2-1.15Z" />
               </svg>
               Continue with Google
             </Button>
+            )}
 
             <div className="my-6 flex items-center gap-3 text-[11px] uppercase tracking-wider text-ink/40">
               <span className="h-px flex-1 bg-ink/10" />

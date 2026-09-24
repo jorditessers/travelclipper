@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { brokeredPreviewStorage } from './previewAuthStorage';
+import { DEMO_ANON_KEY, DEMO_SUPABASE_URL } from '@/integrations/demo-backend/mode';
 
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith('sb_publishable_') || value.startsWith('sb_secret_');
@@ -51,6 +52,9 @@ function createSupabaseClient() {
   const SUPABASE_URL = import.meta.env['VITE_SUPABASE_URL'] || env['SUPABASE_URL'];
   const SUPABASE_PUBLISHABLE_KEY = import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'] || env['SUPABASE_PUBLISHABLE_KEY'];
 
+  if ((!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) && !import.meta.env.SSR && typeof window !== 'undefined') {
+    return createLocalDemoClient();
+  }
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     console.warn('[Supabase] No database connected (VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY not set). Running without accounts and data.');
     return createClient<Database>('https://not-configured.invalid', 'not-configured', {
@@ -69,6 +73,37 @@ function createSupabaseClient() {
       autoRefreshToken: true,
     },
   });
+}
+
+/**
+ * No Supabase project configured: the browser runs the demo backend (a PostgreSQL database in the
+ * visitor's browser, see src/integrations/demo-backend). Loaded on first use only.
+ */
+function createLocalDemoClient() {
+  const client = createClient<Database>(DEMO_SUPABASE_URL, DEMO_ANON_KEY, {
+    global: {
+      fetch: async (input, init) => (await import('@/integrations/demo-backend')).demoFetch(input, init),
+    },
+    auth: { storage: localStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
+  });
+  // Signed URLs point at files inside the local database: hand out object URLs instead.
+  const from = client.storage.from.bind(client.storage);
+  const token = async () => (await client.auth.getSession()).data.session?.access_token;
+  client.storage.from = ((bucket: string) => {
+    const api = from(bucket);
+    api.createSignedUrls = (async (paths: string[]) => {
+      const { demoSignedUrls } = await import('@/integrations/demo-backend');
+      const urls = await demoSignedUrls(bucket, paths, await token());
+      return { data: paths.map((path) => ({ path, signedUrl: urls.get(path) ?? '', signedURL: urls.get(path) ?? '', error: urls.has(path) ? null : 'Object not found' })), error: null };
+    }) as typeof api.createSignedUrls;
+    api.createSignedUrl = (async (path: string) => {
+      const { demoSignedUrls } = await import('@/integrations/demo-backend');
+      const url = (await demoSignedUrls(bucket, [path], await token())).get(path);
+      return url ? { data: { signedUrl: url }, error: null } : { data: null, error: new Error('Object not found') };
+    }) as typeof api.createSignedUrl;
+    return api;
+  }) as typeof client.storage.from;
+  return client;
 }
 
 let _supabase: ReturnType<typeof createSupabaseClient> | undefined;

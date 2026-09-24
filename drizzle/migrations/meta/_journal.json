@@ -190,6 +190,13 @@
       "when": 1790254126535,
       "tag": "0026_account_settings_and_billing",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1790259191368,
+      "tag": "0027_accommodation_assets_bucket",
+      "breakpoints": true
     }
   ]
 }

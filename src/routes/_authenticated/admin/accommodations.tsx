@@ -9,6 +9,7 @@ import { Badge, DataTable, EmptyState, Field, NativeSelect, PageHeader, Skeleton
 import { ExcludeDemoToggle, NoteDialog, fmtDate } from "@/components/admin/shared";
 import { ACCOMMODATION_STATUS_LABEL, accommodationTypeLabel, type AccommodationStatus } from "@/lib/constants";
 import { friendlyError } from "@/lib/errors";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
 
 export const Route = createFileRoute("/_authenticated/admin/accommodations")({
   head: () => ({
@@ -30,7 +31,7 @@ const tone = (s: string) => (s === "active" ? "moss" : s === "pending_review" ? 
 
 function Page() {
   const qc = useQueryClient();
-  const [exclude, setExclude] = useState(true);
+  const [exclude, setExclude] = useState(!isLocalDemo()); // browser demo: everything is demo data
   const [status, setStatus] = useState("");
   const [term, setTerm] = useState("");
   const q = useQuery({
