@@ -183,6 +183,13 @@
       "when": 1790245747696,
       "tag": "0025_restrict_platform_settings_read",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1790254126535,
+      "tag": "0026_account_settings_and_billing",
+      "breakpoints": true
     }
   ]
 }

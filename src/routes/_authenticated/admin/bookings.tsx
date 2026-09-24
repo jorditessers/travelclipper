@@ -9,6 +9,7 @@ import { Badge, DataTable, EmptyState, Field, NativeSelect, PageHeader, Skeleton
 import { ExcludeDemoToggle, NoteDialog, downloadCsv, fmtDate } from "@/components/admin/shared";
 import { eur } from "@/components/bookings/shared";
 import { friendlyError } from "@/lib/errors";
+import type { BillingDetails } from "@/lib/billing";
 import type { Database } from "@/integrations/supabase/types";
 
 type BookingStatus = Database["public"]["Enums"]["booking_status"];
@@ -32,6 +33,9 @@ const STATUSES: BookingStatus[] = ["reported", "confirmed", "completed", "cancel
 const LABEL: Record<BookingStatus, string> = { reported: "Reported", confirmed: "Confirmed", completed: "Completed", cancelled: "Cancelled", rejected: "Rejected" };
 const tone = (s: BookingStatus) => (s === "completed" || s === "confirmed" ? "moss" : s === "reported" ? "clay" : "neutral") as "moss" | "clay" | "neutral";
 
+const billingAddress = (b: BillingDetails | null) =>
+  b ? [b.address_line1, b.address_line2, `${b.postal_code} ${b.city}`, b.country].filter(Boolean).join(", ") : "";
+
 function Page() {
   const qc = useQueryClient();
   const [exclude, setExclude] = useState(true);
@@ -47,13 +51,20 @@ function Page() {
       if (error) throw error;
       const pids = [...new Set(data.map((b) => b.partner_id))];
       const oids = [...new Set(data.map((b) => b.accommodations?.owner_id).filter(Boolean) as string[])];
-      const [{ data: dps }, { data: owners }] = await Promise.all([
+      const bids = [...new Set([...pids, ...oids])];
+      const [{ data: dps }, { data: owners }, { data: bills }] = await Promise.all([
         pids.length ? supabase.from("distribution_partner_profiles").select("user_id, brand_name").in("user_id", pids) : Promise.resolve({ data: [] as { user_id: string; brand_name: string }[] }),
-        oids.length ? supabase.from("profiles").select("id, company_name").in("id", oids) : Promise.resolve({ data: [] as { id: string; company_name: string | null }[] }),
+        oids.length ? supabase.from("profiles").select("id, company_name, email").in("id", oids) : Promise.resolve({ data: [] as { id: string; company_name: string | null; email: string | null }[] }),
+        bids.length ? supabase.from("billing_details").select("*").in("user_id", bids) : Promise.resolve({ data: [] as BillingDetails[] }),
       ]);
       const brand = new Map((dps ?? []).map((d) => [d.user_id, d.brand_name]));
-      const owner = new Map((owners ?? []).map((o) => [o.id, o.company_name]));
-      return data.map((b) => ({ ...b, brand: brand.get(b.partner_id) ?? "—", owner: owner.get(b.accommodations?.owner_id ?? "") ?? "—", accName: b.accommodations?.name ?? "—" }));
+      const owner = new Map((owners ?? []).map((o) => [o.id, o]));
+      const bill = new Map((bills ?? []).map((x) => [x.user_id, x]));
+      return data.map((b) => {
+        const oid = b.accommodations?.owner_id ?? "";
+        return { ...b, brand: brand.get(b.partner_id) ?? "—", owner: owner.get(oid)?.company_name ?? "—", ownerEmail: owner.get(oid)?.email ?? "",
+          ownerBilling: bill.get(oid) ?? null, partnerBilling: bill.get(b.partner_id) ?? null, accName: b.accommodations?.name ?? "—" };
+      });
     },
   });
 
@@ -75,10 +86,14 @@ function Page() {
 
   const exportCsv = () => {
     const head = ["booking_id", "status", "accommodation", "accommodation_owner", "distribution_partner", "tracking_code", "source", "booking_date", "check_in", "check_out", "guests",
-      "booking_value_eur", "commission_pool_pct", "partner_share_of_pool", "commission_total_eur", "partner_commission_eur", "platform_commission_eur", "confirmed_at", "note"];
+      "booking_value_eur", "commission_pool_pct", "partner_share_of_pool", "commission_total_eur", "partner_commission_eur", "platform_commission_eur", "confirmed_at", "note",
+      "owner_legal_name", "owner_address", "owner_vat_number", "owner_invoice_email",
+      "partner_legal_name", "partner_account_holder", "partner_iban", "partner_vat_number", "partner_bank_details_changed_at"];
     downloadCsv(`vellum-bookings${month ? `-${month}` : ""}${acc ? `-${accOptions.find(([id]) => id === acc)?.[1].replace(/\W+/g, "-").toLowerCase()}` : ""}.csv`, [head,
       ...rows.map((b) => [b.id, b.status, b.accName, b.owner, b.brand, b.tracking_code, b.source, b.booking_date, b.check_in, b.check_out, b.guests,
-        b.booking_value, b.commission_pool_pct, b.partner_share_of_pool, b.commission_total, b.partner_commission, b.platform_commission, b.confirmed_at, b.rejection_reason])]);
+        b.booking_value, b.commission_pool_pct, b.partner_share_of_pool, b.commission_total, b.partner_commission, b.platform_commission, b.confirmed_at, b.rejection_reason,
+        b.ownerBilling?.legal_name, billingAddress(b.ownerBilling), b.ownerBilling?.vat_number, b.ownerBilling?.invoice_email ?? b.ownerEmail,
+        b.partnerBilling?.legal_name, b.partnerBilling?.account_holder, b.partnerBilling?.iban, b.partnerBilling?.vat_number, b.partnerBilling?.payout_details_updated_at])]);
     toast.success(`Exported ${rows.length} bookings`);
   };
   const sum = (k: "booking_value" | "commission_total" | "partner_commission" | "platform_commission") =>

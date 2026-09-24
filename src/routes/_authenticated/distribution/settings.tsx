@@ -1,15 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Settings } from "lucide-react";
-import { PlaceholderPage } from "@/components/app/PlaceholderPage";
-import { SettingsPreview } from '@/components/app/SettingsPreview';
+import { SettingsPage } from "@/components/settings/SettingsPage";
 
 export const Route = createFileRoute("/_authenticated/distribution/settings")({
   head: () => ({
     meta: [
       { title: "Settings — Vellum" },
-      { name: "description", content: "Profile, company and preferences." },
+      { name: "description", content: "Your partner profile, payout details and account." },
       { property: "og:title", content: "Settings — Vellum" },
-      { property: "og:description", content: "Profile, company and preferences." },
+      { property: "og:description", content: "Your partner profile, payout details and account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -19,9 +17,5 @@ export const Route = createFileRoute("/_authenticated/distribution/settings")({
 });
 
 function Page() {
-  return (
-    <PlaceholderPage role="distribution_partner" title="Settings" description="Profile, company and preferences." icon={Settings} showTable={false}>
-      <SettingsPreview />
-    </PlaceholderPage>
-  );
+  return <SettingsPage role="distribution_partner" />;
 }

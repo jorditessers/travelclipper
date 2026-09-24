@@ -8,12 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { GlassCard, Eyebrow } from "@/components/site/Primitives";
 import { ChipMultiSelect, Field, TextInput } from "@/components/app/ui-kit";
-import { MARKETS, NICHES, type DistributionType, type Niche } from "@/lib/constants";
+import { MARKETS, NICHES, REACH_BANDS, type DistributionType, type Niche, type ReachBand } from "@/lib/constants";
 import { accessQuery, homeFor } from "@/lib/access";
 import { cn } from "@/lib/utils";
-import type { Database } from "@/integrations/supabase/types";
-
-type ReachBand = Database["public"]["Enums"]["reach_band"];
 
 export const Route = createFileRoute("/_authenticated/onboarding/distribution")({
   head: () => ({
@@ -41,13 +38,7 @@ const TYPES: { value: DistributionType; title: string; body: string; icon: Lucid
   { value: "publisher", title: "Publisher", body: "Monetize travel content across websites, newsletters or media.", icon: Newspaper },
   { value: "niche_community", title: "Niche Community", body: "Connect a relevant community with curated travel experiences.", icon: Users },
 ];
-const REACH: { value: ReachBand; label: string }[] = [
-  { value: "lt_1k", label: "<1k" },
-  { value: "1k_10k", label: "1k-10k" },
-  { value: "10k_50k", label: "10k-50k" },
-  { value: "50k_250k", label: "50k-250k" },
-  { value: "250k_plus", label: "250k+" },
-];
+const REACH = REACH_BANDS;
 const STEPS = ["Distribution type", "Profile", "Terms"];
 const STORE = "vellum.dpOnboarding";
 const MAX_NICHES = 5;

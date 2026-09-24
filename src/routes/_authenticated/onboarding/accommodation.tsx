@@ -8,14 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { GlassCard, Eyebrow } from "@/components/site/Primitives";
 import { ChipMultiSelect, Field, NativeSelect, TextInput } from "@/components/app/ui-kit";
-import { MARKETS } from "@/lib/constants";
+import { ACCOMMODATION_COUNT_BANDS, AP_BUSINESS_TYPES, AP_GOALS, MARKETS } from "@/lib/constants";
 import { accessQuery, homeFor } from "@/lib/access";
 import { cn } from "@/lib/utils";
-import type { Database } from "@/integrations/supabase/types";
-
-type BusinessType = Database["public"]["Enums"]["ap_business_type"];
-type CountBand = Database["public"]["Enums"]["accommodation_count_band"];
-type Goal = Database["public"]["Enums"]["ap_goal"];
+import type { AccommodationCountBand as CountBand, ApBusinessType as BusinessType, ApGoal as Goal } from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/onboarding/accommodation")({
   head: () => ({
@@ -35,28 +31,9 @@ export const Route = createFileRoute("/_authenticated/onboarding/accommodation")
   component: Page,
 });
 
-const BUSINESS_TYPES: { value: BusinessType; label: string }[] = [
-  { value: "individual_owner", label: "Individual Property Owner" },
-  { value: "boutique_hotel", label: "Boutique Hotel" },
-  { value: "independent_hotel", label: "Independent Hotel" },
-  { value: "villa_management", label: "Villa Management Company" },
-  { value: "bnb", label: "B&B" },
-  { value: "resort", label: "Resort" },
-  { value: "other", label: "Other" },
-];
-const BANDS: { value: CountBand; label: string }[] = [
-  { value: "1", label: "1" },
-  { value: "2_5", label: "2-5" },
-  { value: "6_20", label: "6-20" },
-  { value: "21_plus", label: "21+" },
-];
-const GOALS: { value: Goal; label: string }[] = [
-  { value: "direct_bookings", label: "Generate more direct bookings" },
-  { value: "reduce_ota_dependency", label: "Reduce dependency on OTAs" },
-  { value: "new_audiences", label: "Reach new audiences" },
-  { value: "travel_seller_relationships", label: "Build relationships with travel sellers" },
-  { value: "fill_low_demand", label: "Fill low-demand periods" },
-];
+const BUSINESS_TYPES = AP_BUSINESS_TYPES;
+const BANDS = ACCOMMODATION_COUNT_BANDS;
+const GOALS = AP_GOALS;
 const STEPS = ["Contact", "Business", "Goals", "Terms"];
 const STORE = "vellum.apOnboarding";
 

@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Badge, DataTable, EmptyState, NativeSelect, PageHeader, Skeleton, TextInput } from "@/components/app/ui-kit";
 import { ExcludeDemoToggle, REACH_LABEL, ROLE_TEXT, fmtDate } from "@/components/admin/shared";
 import { distributionTypeLabel, marketLabel, nicheLabel } from "@/lib/constants";
+import { formatIban } from "@/lib/billing";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   head: () => ({
@@ -84,6 +85,15 @@ function ProfileSheet({ user, onClose }: { user: UserRow | null; onClose: () => 
       return { kind: "ap" as const, ap: data, stays: count ?? 0 };
     },
   });
+  const billing = useQuery({
+    queryKey: ["admin-user-billing", user?.id],
+    enabled: !!user && (user.role === "distribution_partner" || user.role === "accommodation_partner"),
+    queryFn: async () => {
+      const { data, error } = await supabase.from("billing_details").select("*").eq("user_id", user!.id).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
   const row = (k: string, v: React.ReactNode) => <div className="flex justify-between gap-4 border-b py-2 text-sm last:border-0"><span className="text-muted-foreground">{k}</span><span className="text-right">{v || "—"}</span></div>;
   return (
     <Sheet open={!!user} onOpenChange={(o) => !o && onClose()}>
@@ -127,6 +137,20 @@ function ProfileSheet({ user, onClose }: { user: UserRow | null; onClose: () => 
                 {row("Goals", q.data.ap.goals.map((g) => g.replace(/_/g, " ")).join(", "))}
               </div>
             ) : <p className="text-sm text-muted-foreground">No accommodation profile yet.</p>)}
+            {billing.error && <p className="text-sm text-muted-foreground">We couldn't load the billing details. Close and try again.</p>}
+            {billing.isSuccess && (user.role === "distribution_partner" || user.role === "accommodation_partner") && (billing.data ? (
+              <div>
+                <p className="eyebrow mb-2">{user.role === "distribution_partner" ? "Payout details" : "Invoicing details"}</p>
+                {row(billing.data.is_business ? "Legal name" : "Full name", billing.data.legal_name)}
+                {row("Address", [billing.data.address_line1, billing.data.address_line2, `${billing.data.postal_code} ${billing.data.city}`, billing.data.country].filter(Boolean).join(", "))}
+                {billing.data.is_business && row("VAT number", billing.data.vat_number)}
+                {billing.data.is_business && row("Chamber of Commerce", billing.data.coc_number)}
+                {row("Billing email", billing.data.invoice_email ?? `${user.email ?? "—"} (login email)`)}
+                {user.role === "distribution_partner" && row("Account holder", billing.data.account_holder)}
+                {user.role === "distribution_partner" && row("IBAN", billing.data.iban && <span className="font-mono">{formatIban(billing.data.iban)}</span>)}
+                {billing.data.payout_details_updated_at && row("Bank details changed", fmtDate(billing.data.payout_details_updated_at))}
+              </div>
+            ) : <p className="text-sm text-clay">{user.role === "distribution_partner" ? "No payout details yet. Commission can't be paid out." : "No invoicing details yet."}</p>)}
           </div>
         </>}
       </SheetContent>

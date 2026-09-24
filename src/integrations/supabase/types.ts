@@ -340,6 +340,66 @@ export type Database = {
         }
         Relationships: []
       }
+      billing_details: {
+        Row: {
+          account_holder: string | null
+          address_line1: string
+          address_line2: string | null
+          city: string
+          coc_number: string | null
+          country: string
+          created_at: string
+          iban: string | null
+          invoice_email: string | null
+          is_business: boolean
+          is_demo: boolean
+          legal_name: string
+          payout_details_updated_at: string | null
+          postal_code: string
+          updated_at: string
+          user_id: string
+          vat_number: string | null
+        }
+        Insert: {
+          account_holder?: string | null
+          address_line1: string
+          address_line2?: string | null
+          city: string
+          coc_number?: string | null
+          country: string
+          created_at?: string
+          iban?: string | null
+          invoice_email?: string | null
+          is_business?: boolean
+          is_demo?: boolean
+          legal_name: string
+          payout_details_updated_at?: string | null
+          postal_code: string
+          updated_at?: string
+          user_id: string
+          vat_number?: string | null
+        }
+        Update: {
+          account_holder?: string | null
+          address_line1?: string
+          address_line2?: string | null
+          city?: string
+          coc_number?: string | null
+          country?: string
+          created_at?: string
+          iban?: string | null
+          invoice_email?: string | null
+          is_business?: boolean
+          is_demo?: boolean
+          legal_name?: string
+          payout_details_updated_at?: string | null
+          postal_code?: string
+          updated_at?: string
+          user_id?: string
+          vat_number?: string | null
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           accommodation_id: string
@@ -1157,6 +1217,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      iban_is_valid: { Args: { _iban: string }; Returns: boolean }
       is_demo_user: { Args: { _uid: string }; Returns: boolean }
       is_distributable: {
         Args: { _accommodation_id: string }
@@ -1248,6 +1309,23 @@ export type Database = {
         }
         Returns: undefined
       }
+      save_my_billing_details: {
+        Args: {
+          _account_holder: string | null
+          _address_line1: string
+          _address_line2: string | null
+          _city: string
+          _coc_number: string | null
+          _country: string
+          _iban: string | null
+          _invoice_email: string | null
+          _is_business: boolean
+          _legal_name: string
+          _postal_code: string
+          _vat_number: string | null
+        }
+        Returns: undefined
+      }
       score_accommodation_for_partner: {
         Args: { _accommodation_id: string; _partner_id: string }
         Returns: {
@@ -1258,6 +1336,34 @@ export type Database = {
       set_asset_cover: { Args: { _asset_id: string }; Returns: undefined }
       submit_accommodation_for_review: {
         Args: { _accommodation_id: string }
+        Returns: undefined
+      }
+      update_accommodation_partner_profile: {
+        Args: {
+          _business_type: Database["public"]["Enums"]["ap_business_type"]
+          _company_name: string
+          _count_band: Database["public"]["Enums"]["accommodation_count_band"]
+          _country: string
+          _first_name: string
+          _goals: Database["public"]["Enums"]["ap_goal"][]
+          _last_name: string
+          _website: string
+        }
+        Returns: undefined
+      }
+      update_distribution_partner_profile: {
+        Args: {
+          _bio: string
+          _brand_name: string
+          _distribution_type: Database["public"]["Enums"]["distribution_type"]
+          _first_name: string
+          _last_name: string
+          _markets: string[]
+          _niches: Database["public"]["Enums"]["niche"][]
+          _reach_band: Database["public"]["Enums"]["reach_band"]
+          _social_links: string[]
+          _website: string
+        }
         Returns: undefined
       }
     }

@@ -101,3 +101,38 @@ export const isHttpsUrl = (v: string) => {
     return false;
   }
 };
+
+export type ApBusinessType = Database["public"]["Enums"]["ap_business_type"];
+export type AccommodationCountBand = Database["public"]["Enums"]["accommodation_count_band"];
+export type ApGoal = Database["public"]["Enums"]["ap_goal"];
+export type ReachBand = Database["public"]["Enums"]["reach_band"];
+
+export const AP_BUSINESS_TYPES: { value: ApBusinessType; label: string }[] = [
+  { value: "individual_owner", label: "Individual Property Owner" },
+  { value: "boutique_hotel", label: "Boutique Hotel" },
+  { value: "independent_hotel", label: "Independent Hotel" },
+  { value: "villa_management", label: "Villa Management Company" },
+  { value: "bnb", label: "B&B" },
+  { value: "resort", label: "Resort" },
+  { value: "other", label: "Other" },
+];
+export const ACCOMMODATION_COUNT_BANDS: { value: AccommodationCountBand; label: string }[] = [
+  { value: "1", label: "1" },
+  { value: "2_5", label: "2-5" },
+  { value: "6_20", label: "6-20" },
+  { value: "21_plus", label: "21+" },
+];
+export const AP_GOALS: { value: ApGoal; label: string }[] = [
+  { value: "direct_bookings", label: "Generate more direct bookings" },
+  { value: "reduce_ota_dependency", label: "Reduce dependency on OTAs" },
+  { value: "new_audiences", label: "Reach new audiences" },
+  { value: "travel_seller_relationships", label: "Build relationships with travel sellers" },
+  { value: "fill_low_demand", label: "Fill low-demand periods" },
+];
+export const REACH_BANDS: { value: ReachBand; label: string }[] = [
+  { value: "lt_1k", label: "<1k" },
+  { value: "1k_10k", label: "1k-10k" },
+  { value: "10k_50k", label: "10k-50k" },
+  { value: "50k_250k", label: "50k-250k" },
+  { value: "250k_plus", label: "250k+" },
+];
