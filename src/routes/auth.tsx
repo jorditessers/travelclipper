@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { NOT_CONFIGURED_MESSAGE, isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { GlassCard, Eyebrow } from "@/components/site/Primitives";
@@ -68,6 +68,9 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  // Decided in the browser only, so server and client render the same markup first.
+  const [configured, setConfigured] = useState(true);
+  useEffect(() => setConfigured(isSupabaseConfigured()), []);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/dashboard", replace: true });
@@ -146,7 +149,13 @@ function AuthPage() {
                 : "Sign in to manage your inventory or find stays to distribute."}
             </p>
 
-            <Button variant="outline" className="mt-6 w-full" onClick={handleGoogle} disabled={busy}>
+            {!configured && (
+              <p role="status" className="mt-6 rounded-xl bg-clay/10 px-4 py-3 text-sm text-clay">
+                {NOT_CONFIGURED_MESSAGE} Signing in and creating accounts will open soon.
+              </p>
+            )}
+
+            <Button variant="outline" className="mt-6 w-full" onClick={handleGoogle} disabled={busy || !configured}>
               <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
                 <path fill="currentColor" d="M21.35 11.1H12v2.9h5.35c-.25 1.5-1.7 4.4-5.35 4.4a6.4 6.4 0 1 1 0-12.8c1.85 0 3.1.8 3.8 1.45l2.6-2.5A10 10 0 1 0 12 22c5.75 0 9.55-4.05 9.55-9.75 0-.65-.05-1.15-.2-1.15Z" />
               </svg>
@@ -183,7 +192,7 @@ function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </label>
-              <Button type="submit" className="w-full" disabled={busy}>
+              <Button type="submit" className="w-full" disabled={busy || !configured}>
                 {busy ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
               </Button>
             </form>
