@@ -1,0 +1,188 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790177082330,
+      "tag": "0000_foundation_roles_profiles_accommodations",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790235263594,
+      "tag": "0001_auth_profiles_roles_choose_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790235593084,
+      "tag": "0002_accommodation_partner_profiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790235922703,
+      "tag": "0003_distribution_partner_profiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790236151623,
+      "tag": "0004_accommodation_status_values",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790236999856,
+      "tag": "0005_accommodations_feature",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790237291040,
+      "tag": "0006_accommodation_assets",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790237524871,
+      "tag": "0007_distribution_settings_and_publication",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790238257269,
+      "tag": "0008_activity_events_and_saved",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790238945887,
+      "tag": "0009_commission_campaigns",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790239134677,
+      "tag": "0010_tracking_links_and_clicks",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790239158523,
+      "tag": "0011_record_click_salt_fix",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790239392089,
+      "tag": "0012_bookings_flow",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790239615758,
+      "tag": "0013_ap_dashboard_rpcs",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1790239686520,
+      "tag": "0014_ap_pending_booking_ids",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1790240088128,
+      "tag": "0015_dp_dashboard_rpcs",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1790240485718,
+      "tag": "0016_recommendations",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790240970265,
+      "tag": "0017_admin_area",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790241234818,
+      "tag": "0018_admin_lock_and_period_metrics",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1790241791626,
+      "tag": "0019_security_audit_fixes",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1790242266453,
+      "tag": "0020_fix_submission_blockers_array",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1790243456846,
+      "tag": "0021_demo_mode",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1790243486540,
+      "tag": "0022_demo_reset_bypass",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1790244276808,
+      "tag": "0023_demo_reset_where",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1790244593403,
+      "tag": "0024_demo_guard_profile_login",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1790245747696,
+      "tag": "0025_restrict_platform_settings_read",
+      "breakpoints": true
+    }
+  ]
+}
