@@ -6,6 +6,7 @@ import { BOOTSTRAP_SQL, prepareMigration } from "./bootstrap";
 import { createUser, decodeJwt, handleAuth } from "./auth";
 import { ApiError, handleRest, lit, loadMeta, type Claims, type Meta } from "./postgrest";
 import { readObjects, removeObjects, uploadObject } from "./storage";
+import { PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal";
 import { DEMO_ANON_KEY, DEMO_SERVICE_KEY, DEMO_SUPABASE_URL, LOCAL_DEMO_ADMIN_EMAIL, LOCAL_DEMO_PASSWORD } from "./mode";
 
 // Local-only adjustments on top of the migrations.
@@ -93,7 +94,7 @@ async function seed(backend: Backend) {
   const { runDemoSeed } = await import("@/lib/demo-seed-run");
   await runDemoSeed(serviceClient(backend), LOCAL_DEMO_PASSWORD);
   const { db } = backend;
-  const admin = await createUser(db, LOCAL_DEMO_ADMIN_EMAIL, LOCAL_DEMO_PASSWORD);
+  const admin = await createUser(db, LOCAL_DEMO_ADMIN_EMAIL, LOCAL_DEMO_PASSWORD, { terms_version: TERMS_VERSION, privacy_version: PRIVACY_VERSION, legal_user_agent: "demo seed" });
   await db.exec(`
     INSERT INTO public.profiles (id, email, first_name, last_name, display_name, company_name, country, onboarding_completed, is_demo)
     VALUES (${lit(admin.id)}, ${lit(LOCAL_DEMO_ADMIN_EMAIL)}, 'Demo', 'Admin', 'Demo Admin', 'Platform team', 'NL', true, true)

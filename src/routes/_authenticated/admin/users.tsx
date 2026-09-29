@@ -95,6 +95,15 @@ function ProfileSheet({ user, onClose }: { user: UserRow | null; onClose: () => 
       return data;
     },
   });
+  const legal = useQuery({
+    queryKey: ["admin-user-legal", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("legal_acceptances").select("document, version, accepted_at, source").eq("user_id", user!.id).order("accepted_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
   const row = (k: string, v: React.ReactNode) => <div className="flex justify-between gap-4 border-b py-2 text-sm last:border-0"><span className="text-muted-foreground">{k}</span><span className="text-right">{v || "—"}</span></div>;
   return (
     <Sheet open={!!user} onOpenChange={(o) => !o && onClose()}>
@@ -110,7 +119,12 @@ function ProfileSheet({ user, onClose }: { user: UserRow | null; onClose: () => 
               {row("Company", user.company_name)}
               {row("Country", user.country && marketLabel(user.country))}
               {row("Onboarding", user.onboarding_completed ? "Completed" : "Not completed")}
-              {row("Terms accepted", fmtDate(user.terms_accepted_at))}
+              {row("Commission terms (onboarding)", fmtDate(user.terms_accepted_at))}
+              {(["terms", "privacy"] as const).map((d) => {
+                const a = legal.data?.find((x) => x.document === d);
+                return row(d === "terms" ? "Terms and Conditions" : "Privacy Statement",
+                  a ? `v${a.version} · ${new Date(a.accepted_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}${a.source === "in_app" ? " (in app)" : ""}` : legal.isLoading ? "…" : "Not accepted");
+              })}
               {row("Joined", fmtDate(user.created_at))}
               {row("Demo account", user.is_demo ? "Yes" : "No")}
             </div>
