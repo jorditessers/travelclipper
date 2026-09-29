@@ -3,6 +3,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import * as S from "./demo-seed-data";
+import { PRIVACY_VERSION, TERMS_VERSION } from "./legal";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export async function runDemoSeed(db: SupabaseClient<Database>, password: string) {
@@ -24,7 +25,11 @@ export async function runDemoSeed(db: SupabaseClient<Database>, password: string
         if (error) throw new Error(error.message);
         return found;
       }
-      const { data, error } = await db.auth.admin.createUser({ email, password, email_confirm: true });
+      // Seeded accounts carry the accepted terms like a normal sign-up (required by the auth.users guard).
+      const { data, error } = await db.auth.admin.createUser({
+        email, password, email_confirm: true,
+        user_metadata: { terms_version: TERMS_VERSION, privacy_version: PRIVACY_VERSION, legal_user_agent: "demo seed" },
+      });
       if (error) throw new Error(error.message);
       return data.user.id;
     };

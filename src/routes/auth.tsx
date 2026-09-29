@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { NOT_CONFIGURED_MESSAGE, isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { isLocalDemo } from "@/integrations/demo-backend/mode";
+import { LegalCheckbox } from "@/components/site/LegalCheckbox";
+import { PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { GlassCard, Eyebrow } from "@/components/site/Primitives";
@@ -88,6 +90,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [legal, setLegal] = useState(false);
   // Decided in the browser only, so server and client render the same markup first.
   const [configured, setConfigured] = useState(true);
   const [localDemo, setLocalDemo] = useState(false);
@@ -109,10 +112,15 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
+        if (!legal) throw new Error("Accept the Terms and Conditions and the Privacy Statement to create an account.");
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+          options: {
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+            // Recorded by the database as proof of acceptance (version + date/time); sign-up is refused without it.
+            data: { terms_version: TERMS_VERSION, privacy_version: PRIVACY_VERSION, legal_user_agent: navigator.userAgent },
+          },
         });
         if (error) throw error;
         if (!data.session) {
@@ -188,7 +196,7 @@ function AuthPage() {
             )}
 
             {!localDemo && (
-            <Button variant="outline" className="mt-6 w-full" onClick={handleGoogle} disabled={busy || !configured}>
+            <Button variant="outline" className="mt-6 w-full" onClick={handleGoogle} disabled={busy || !configured || (mode === "signup" && !legal)}>
               <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
                 <path fill="currentColor" d="M21.35 11.1H12v2.9h5.35c-.25 1.5-1.7 4.4-5.35 4.4a6.4 6.4 0 1 1 0-12.8c1.85 0 3.1.8 3.8 1.45l2.6-2.5A10 10 0 1 0 12 22c5.75 0 9.55-4.05 9.55-9.75 0-.65-.05-1.15-.2-1.15Z" />
               </svg>
@@ -226,7 +234,8 @@ function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </label>
-              <Button type="submit" className="w-full" disabled={busy || !configured}>
+              {mode === "signup" && <LegalCheckbox checked={legal} onChange={setLegal} />}
+              <Button type="submit" className="w-full" disabled={busy || !configured || (mode === "signup" && !legal)}>
                 {busy ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
               </Button>
             </form>

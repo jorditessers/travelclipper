@@ -701,6 +701,36 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_acceptances: {
+        Row: {
+          accepted_at: string
+          document: string
+          id: string
+          source: string
+          user_agent: string | null
+          user_id: string
+          version: string
+        }
+        Insert: {
+          accepted_at?: string
+          document: string
+          id?: string
+          source: string
+          user_agent?: string | null
+          user_id: string
+          version: string
+        }
+        Update: {
+          accepted_at?: string
+          document?: string
+          id?: string
+          source?: string
+          user_agent?: string | null
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           demo_baseline_at: string | null
@@ -863,6 +893,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_legal_documents: {
+        Args: { _privacy_version: string; _terms_version: string; _user_agent?: string }
+        Returns: undefined
+      }
       accommodation_submission_blockers: {
         Args: { _accommodation_id: string }
         Returns: string[]
@@ -1210,6 +1244,7 @@ export type Database = {
         }[]
       }
       get_partner_share_of_pool: { Args: never; Returns: number }
+      has_accepted_legal: { Args: { _uid: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

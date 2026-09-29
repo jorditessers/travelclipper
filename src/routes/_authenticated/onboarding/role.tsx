@@ -1,6 +1,6 @@
 import { friendlyError } from "@/lib/errors";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Building2, Compass } from "lucide-react";
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { GlassCard, Eyebrow } from "@/components/site/Primitives";
 import { accessQuery, homeFor } from "@/lib/access";
 import { cn } from "@/lib/utils";
+import { LegalCheckbox } from "@/components/site/LegalCheckbox";
+import { PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal";
 
 type PartnerRole = "accommodation_partner" | "distribution_partner";
 
@@ -48,6 +50,18 @@ function RolePage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [role, setRole] = useState<PartnerRole | null>(null);
+  const [legal, setLegal] = useState(false);
+  // Accounts created via another provider (or before acceptance existed) accept the terms here.
+  const accepted = useQuery({
+    queryKey: ["legal-accepted"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      const { data, error } = await supabase.rpc("has_accepted_legal", { _uid: u.user!.id });
+      if (error) throw error;
+      return Boolean(data);
+    },
+  });
+  const needsLegal = accepted.data === false;
 
   useEffect(() => {
     const v = sessionStorage.getItem("vellum.intendedRole");
@@ -57,6 +71,13 @@ function RolePage() {
   const m = useMutation({
     mutationFn: async () => {
       if (!role) throw new Error("Choose a partner type");
+      if (needsLegal) {
+        if (!legal) throw new Error("Accept the Terms and Conditions and the Privacy Statement to continue.");
+        const { error: lErr } = await supabase.rpc("accept_legal_documents", {
+          _terms_version: TERMS_VERSION, _privacy_version: PRIVACY_VERSION, _user_agent: navigator.userAgent,
+        });
+        if (lErr) throw lErr;
+      }
       const { error } = await supabase.rpc("choose_role", { _role: role });
       if (error) throw error;
     },
@@ -89,8 +110,13 @@ function RolePage() {
           </button>
         ))}
       </div>
+      {needsLegal && (
+        <div className="mt-8 rounded-2xl border bg-paper/60 p-5">
+          <LegalCheckbox checked={legal} onChange={setLegal} />
+        </div>
+      )}
       <div className="mt-8 flex justify-end">
-        <Button size="lg" disabled={!role || m.isPending} onClick={() => m.mutate()}>
+        <Button size="lg" disabled={!role || m.isPending || accepted.isLoading || (needsLegal && !legal)} onClick={() => m.mutate()}>
           {m.isPending ? "Saving…" : "Continue"}
         </Button>
       </div>

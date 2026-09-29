@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useMe, useSession, useSignOut } from "@/lib/auth";
+import { LEGAL_ENTITY, legalValue } from "@/lib/legal";
 
 export function Brand() {
   return (
@@ -78,8 +79,16 @@ export function SiteFooter() {
         <span className="font-display text-sm text-ink/70">
           Vellum — open distribution for independent travel
         </span>
-        <span>EUR · Commission calculated in-database</span>
+        <nav className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <Link to="/terms" className="hover:text-ink">Algemene Voorwaarden</Link>
+          <Link to="/privacy" className="hover:text-ink">Privacyverklaring</Link>
+          <a href={`mailto:${LEGAL_ENTITY.email}`} className="hover:text-ink">{LEGAL_ENTITY.email}</a>
+        </nav>
       </div>
+      {/* Company identity, as required for online business services */}
+      <p className="mx-auto max-w-6xl px-6 pb-6 text-center text-[11px] text-ink/40 sm:text-left">
+        {[legalValue("legalName"), legalValue("address"), `KvK ${legalValue("coc")}`, `Btw ${legalValue("vat")}`].join(" · ")}
+      </p>
     </footer>
   );
 }
