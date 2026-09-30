@@ -18,9 +18,9 @@ type BookingStatus = Database["public"]["Enums"]["booking_status"];
 export const Route = createFileRoute("/_authenticated/admin/bookings")({
   head: () => ({
     meta: [
-      { title: "Bookings — Vellum admin" },
+      { title: "Bookings — Holiday Clippers admin" },
       { name: "description", content: "All bookings, corrections and CSV export for invoicing and payouts." },
-      { property: "og:title", content: "Bookings — Vellum admin" },
+      { property: "og:title", content: "Bookings — Holiday Clippers admin" },
       { property: "og:description", content: "All bookings, corrections and CSV export for invoicing and payouts." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

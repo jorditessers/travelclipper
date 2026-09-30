@@ -7,7 +7,7 @@ import stayCasaLumen from "@/assets/stay-casa-lumen.jpg";
 import stayLoftFig from "@/assets/stay-loft-fig.jpg";
 import stayVillaMares from "@/assets/stay-villa-mares.jpg";
 
-const TITLE = "Vellum — Open distribution for independent travel";
+const TITLE = "Holiday Clippers — Open distribution for independent travel";
 const DESCRIPTION =
   "Accommodation partners publish commissionable inventory. Creators, advisors and curators sell it under their own brand and earn on every attributed booking.";
 

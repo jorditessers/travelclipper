@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
+import { enterDemo } from "@/lib/demo";
 import { Card, Skeleton } from "@/components/app/ui-kit";
 import type { Accommodation } from "@/lib/constants";
 
@@ -85,7 +87,10 @@ export function PublishPanel({ accommodation: a }: { accommodation: Accommodatio
         )
       )}
       {a.status === "pending_review" && (
-        <p className="text-sm"><span className="font-medium">Under review.</span> We'll check your stay shortly — you'll see the result here.</p>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <p className="text-sm"><span className="font-medium">Under review.</span> We'll check your stay shortly — you'll see the result here.</p>
+          {isLocalDemo() && <ReviewAsAdminButton />}
+        </div>
       )}
       {(a.status === "active" || a.status === "paused") && (
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -102,5 +107,20 @@ export function PublishPanel({ accommodation: a }: { accommodation: Accommodatio
         </div>
       )}
     </Card>
+  );
+}
+
+/** Browser demo only: the platform team approves stays, so offer to switch to the admin side right away. */
+function ReviewAsAdminButton() {
+  const qc = useQueryClient();
+  const m = useMutation({
+    mutationFn: () => enterDemo("admin", qc),
+    onSuccess: () => window.location.assign("/admin/review"),
+    onError: (e) => toast.error(friendlyError(e)),
+  });
+  return (
+    <Button variant="outline" disabled={m.isPending} onClick={() => m.mutate()}>
+      {m.isPending ? "Opening…" : "Demo: review it as admin"}
+    </Button>
   );
 }

@@ -9,7 +9,7 @@ import { isLocalDemo } from "@/integrations/demo-backend/mode";
 // traveler would land. In the live product /go/<code> logs the click on the server and redirects.
 export const Route = createFileRoute("/demo-link/$code")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Tracking link — Vellum demo" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Tracking link — Holiday Clippers demo" }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
 

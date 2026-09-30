@@ -16,9 +16,9 @@ import type { AccommodationCountBand as CountBand, ApBusinessType as BusinessTyp
 export const Route = createFileRoute("/_authenticated/onboarding/accommodation")({
   head: () => ({
     meta: [
-      { title: "Set up your accommodation account — Vellum" },
+      { title: "Set up your accommodation account — Holiday Clippers" },
       { name: "description", content: "A few short steps to start reaching distribution partners." },
-      { property: "og:title", content: "Set up your accommodation account — Vellum" },
+      { property: "og:title", content: "Set up your accommodation account — Holiday Clippers" },
       { property: "og:description", content: "A few short steps to start reaching distribution partners." },
       { name: "robots", content: "noindex" },
     ],

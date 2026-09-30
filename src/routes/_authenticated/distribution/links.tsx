@@ -14,9 +14,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/distribution/links")({
   head: () => ({
     meta: [
-      { title: "Links — Vellum" },
+      { title: "Links — Holiday Clippers" },
       { name: "description", content: "Your tracking links and partner code." },
-      { property: "og:title", content: "Links — Vellum" },
+      { property: "og:title", content: "Links — Holiday Clippers" },
       { property: "og:description", content: "Your tracking links and partner code." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

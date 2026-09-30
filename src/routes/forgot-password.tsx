@@ -10,10 +10,10 @@ import { Brand } from "@/components/site/SiteHeader";
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
     meta: [
-      { title: "Reset your password — Vellum" },
-      { name: "description", content: "Request a password reset link for your Vellum account." },
-      { property: "og:title", content: "Reset your password — Vellum" },
-      { property: "og:description", content: "Request a password reset link for your Vellum account." },
+      { title: "Reset your password — Holiday Clippers" },
+      { name: "description", content: "Request a password reset link for your Holiday Clippers account." },
+      { property: "og:title", content: "Reset your password — Holiday Clippers" },
+      { property: "og:description", content: "Request a password reset link for your Holiday Clippers account." },
     ],
   }),
   component: ForgotPage,

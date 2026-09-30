@@ -4,9 +4,9 @@ import { SettingsPage } from "@/components/settings/SettingsPage";
 export const Route = createFileRoute("/_authenticated/accommodation/settings")({
   head: () => ({
     meta: [
-      { title: "Settings — Vellum" },
+      { title: "Settings — Holiday Clippers" },
       { name: "description", content: "Your profile, invoicing details and account." },
-      { property: "og:title", content: "Settings — Vellum" },
+      { property: "og:title", content: "Settings — Holiday Clippers" },
       { property: "og:description", content: "Your profile, invoicing details and account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

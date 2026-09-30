@@ -21,9 +21,9 @@ export const Route = createFileRoute("/_authenticated/accommodation/dashboard")(
   validateSearch: zodValidator(z.object({ period: fallback(z.enum(["30", "90", "all"]), "30").default("30") })),
   head: () => ({
     meta: [
-      { title: "Dashboard — Vellum" },
+      { title: "Dashboard — Holiday Clippers" },
       { name: "description", content: "How Distribution Partners engage with your stays." },
-      { property: "og:title", content: "Dashboard — Vellum" },
+      { property: "og:title", content: "Dashboard — Holiday Clippers" },
       { property: "og:description", content: "How Distribution Partners engage with your stays." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

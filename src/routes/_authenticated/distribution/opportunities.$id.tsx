@@ -17,9 +17,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/distribution/opportunities/$id")({
   head: () => ({
     meta: [
-      { title: "Distribution opportunity — Vellum" },
+      { title: "Distribution opportunity — Holiday Clippers" },
       { name: "description", content: "Commission, details and content terms for this stay." },
-      { property: "og:title", content: "Distribution opportunity — Vellum" },
+      { property: "og:title", content: "Distribution opportunity — Holiday Clippers" },
       { property: "og:description", content: "Commission, details and content terms for this stay." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

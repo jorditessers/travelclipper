@@ -14,9 +14,9 @@ import { isLocalDemo } from "@/integrations/demo-backend/mode";
 export const Route = createFileRoute("/_authenticated/admin/users")({
   head: () => ({
     meta: [
-      { title: "Users — Vellum admin" },
+      { title: "Users — Holiday Clippers admin" },
       { name: "description", content: "All users, their role and onboarding status." },
-      { property: "og:title", content: "Users — Vellum admin" },
+      { property: "og:title", content: "Users — Holiday Clippers admin" },
       { property: "og:description", content: "All users, their role and onboarding status." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -148,7 +148,7 @@ function ProfileSheet({ user, onClose }: { user: UserRow | null; onClose: () => 
                 {row("Business type", q.data.ap.business_type.replace(/_/g, " "))}
                 {row("Website", q.data.ap.website)}
                 {row("Accommodations (stated)", q.data.ap.accommodation_count_band.replace("_plus", "+").replace("_", "–"))}
-                {row("Stays on Vellum", q.data.stays)}
+                {row("Stays on Holiday Clippers", q.data.stays)}
                 {row("Goals", q.data.ap.goals.map((g) => g.replace(/_/g, " ")).join(", "))}
               </div>
             ) : <p className="text-sm text-muted-foreground">No accommodation profile yet.</p>)}

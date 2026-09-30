@@ -1,7 +1,7 @@
 // Company details and versions for the legal pages and the acceptance record.
 // Fill in the empty fields before going live; empty fields show as a visible [placeholder].
 export const LEGAL_ENTITY = {
-  platformName: "Holidayclippers",
+  platformName: "Holiday Clippers",
   legalName: "", // juridische bedrijfsnaam, e.g. "Holidayclippers B.V."
   address: "", // vestigingsadres
   coc: "", // KvK-nummer

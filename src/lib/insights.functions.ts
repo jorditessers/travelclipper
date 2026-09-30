@@ -41,7 +41,7 @@ export const analyzeKpiDeviation = createServerFn({ method: "POST" })
 
     const kpiLabel = KPI_OPTIONS.find((k) => k.value === data.kpi)!.label;
     const prompt = [
-      `You are an analyst for Vellum, a B2B travel distribution platform: accommodations offer commission, Distribution Partners (creators, travel advisors, agencies, curators, publishers, communities) promote them via tracking links and earn commission on confirmed bookings. Travelers are not users. Currency EUR.`,
+      `You are an analyst for Holiday Clippers, a B2B travel distribution platform: accommodations offer commission, Distribution Partners (creators, travel advisors, agencies, curators, publishers, communities) promote them via tracking links and earn commission on confirmed bookings. Travelers are not users. Currency EUR.`,
       `The admin observed an ${data.deviation === "drop" ? "unexpected drop" : data.deviation === "increase" ? "unexpected increase" : "unexpected change"} in the KPI "${kpiLabel}" (${data.kpi}) for ${data.from} to ${data.to}.`,
       data.context ? `Admin notes: ${data.context}` : "",
       `Platform metrics (current period vs. the equally long previous period), JSON:\n${JSON.stringify(metrics)}`,

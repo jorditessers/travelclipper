@@ -4,7 +4,7 @@ const CODE = /^[A-Za-z]{3}-[A-Za-z0-9]{5}$/;
 
 function page(title: string, body: string, status: number) {
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>${title} — Vellum</title>
+<meta name="robots" content="noindex"><title>${title} — Holiday Clippers</title>
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f6f1e8;color:#1f1d1a;font-family:Georgia,serif}
 main{max-width:440px;padding:40px 28px;text-align:center}h1{font-weight:400;font-size:30px;margin:0 0 12px}
 p{font-family:system-ui,sans-serif;font-size:15px;line-height:1.6;color:#5b574f;margin:0}</style></head>

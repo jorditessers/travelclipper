@@ -9,13 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Card, EmptyState, PageHeader, Skeleton } from "@/components/app/ui-kit";
 import { ASSET_BUCKET, SIGNED_URL_TTL } from "@/lib/assets";
 import { accommodationTypeLabel, marketLabel } from "@/lib/constants";
+import { isLocalDemo } from "@/integrations/demo-backend/mode";
 
 export const Route = createFileRoute("/_authenticated/admin/review")({
   head: () => ({
     meta: [
-      { title: "Review queue — Vellum" },
+      { title: "Review queue — Holiday Clippers" },
       { name: "description", content: "Accommodations waiting for approval." },
-      { property: "og:title", content: "Review queue — Vellum" },
+      { property: "og:title", content: "Review queue — Holiday Clippers" },
       { property: "og:description", content: "Accommodations waiting for approval." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -50,6 +51,11 @@ function Page() {
   return (
     <div className="space-y-8">
       <PageHeader eyebrow="Admin" title="Review queue" description="Accommodations waiting for approval." />
+      {isLocalDemo() && (
+        <p className="rounded-2xl border border-moss/20 bg-moss/5 px-5 py-3 text-sm text-ink/70">
+          Demo: after approving, sign out (top right) and sign in with your own landlord account to see the stay go live.
+        </p>
+      )}
       {q.isLoading && <div className="space-y-3">{[0, 1].map((i) => <Skeleton key={i} className="h-44" />)}</div>}
       {q.error && <EmptyState icon={ClipboardCheck} title="Couldn't load the queue" description="We couldn't load this right now. Check your connection and try again."
         action={<Button variant="outline" onClick={() => q.refetch()}>Retry</Button>} />}

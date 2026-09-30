@@ -8,9 +8,9 @@ import { Building2 } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/accommodation/accommodations/$id/edit")({
   head: () => ({
     meta: [
-      { title: "Edit accommodation — Vellum" },
+      { title: "Edit accommodation — Holiday Clippers" },
       { name: "description", content: "Update your stay's details." },
-      { property: "og:title", content: "Edit accommodation — Vellum" },
+      { property: "og:title", content: "Edit accommodation — Holiday Clippers" },
       { property: "og:description", content: "Update your stay's details." },
       { name: "robots", content: "noindex" },
     ],

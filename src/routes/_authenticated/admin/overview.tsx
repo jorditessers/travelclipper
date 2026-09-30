@@ -15,9 +15,9 @@ export const Route = createFileRoute("/_authenticated/admin/overview")({
   validateSearch: zodValidator(z.object({ demo: fallback(z.boolean(), false).default(false) })),
   head: () => ({
     meta: [
-      { title: "Admin overview — Vellum" },
+      { title: "Admin overview — Holiday Clippers" },
       { name: "description", content: "Platform totals and MVP hypothesis validation." },
-      { property: "og:title", content: "Admin overview — Vellum" },
+      { property: "og:title", content: "Admin overview — Holiday Clippers" },
       { property: "og:description", content: "Platform totals and MVP hypothesis validation." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

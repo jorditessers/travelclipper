@@ -17,10 +17,10 @@ type PartnerRole = "accommodation_partner" | "distribution_partner";
 export const Route = createFileRoute("/_authenticated/onboarding/role")({
   head: () => ({
     meta: [
-      { title: "Choose your partner type — Vellum" },
-      { name: "description", content: "Tell us how you work with Vellum." },
-      { property: "og:title", content: "Choose your partner type — Vellum" },
-      { property: "og:description", content: "Tell us how you work with Vellum." },
+      { title: "Choose your partner type — Holiday Clippers" },
+      { name: "description", content: "Tell us how you work with Holiday Clippers." },
+      { property: "og:title", content: "Choose your partner type — Holiday Clippers" },
+      { property: "og:description", content: "Tell us how you work with Holiday Clippers." },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -73,10 +73,10 @@ export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Sign in — Vellum" },
-      { name: "description", content: "Sign in or create your Vellum partner account." },
-      { property: "og:title", content: "Sign in — Vellum" },
-      { property: "og:description", content: "Sign in or create your Vellum partner account." },
+      { title: "Sign in — Holiday Clippers" },
+      { name: "description", content: "Sign in or create your Holiday Clippers partner account." },
+      { property: "og:title", content: "Sign in — Holiday Clippers" },
+      { property: "og:description", content: "Sign in or create your Holiday Clippers partner account." },
     ],
   }),
   component: AuthPage,
@@ -249,7 +249,7 @@ function AuthPage() {
             )}
 
             <p className="mt-6 text-center text-[13px] text-ink/60">
-              {mode === "signup" ? "Already a partner?" : "New to Vellum?"}{" "}
+              {mode === "signup" ? "Already a partner?" : "New to Holiday Clippers?"}{" "}
               <button
                 type="button"
                 className="font-medium text-moss underline-offset-4 hover:underline"

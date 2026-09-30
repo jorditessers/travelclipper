@@ -9,9 +9,9 @@ import { DataTable, EmptyState, NativeSelect, PageHeader, Skeleton, TextInput } 
 export const Route = createFileRoute("/_authenticated/admin/audit")({
   head: () => ({
     meta: [
-      { title: "Audit log — Vellum admin" },
+      { title: "Audit log — Holiday Clippers admin" },
       { name: "description", content: "Every admin change to bookings, statuses and settings." },
-      { property: "og:title", content: "Audit log — Vellum admin" },
+      { property: "og:title", content: "Audit log — Holiday Clippers admin" },
       { property: "og:description", content: "Every admin change to bookings, statuses and settings." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

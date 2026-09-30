@@ -15,9 +15,9 @@ import { isLocalDemo } from "@/integrations/demo-backend/mode";
 export const Route = createFileRoute("/_authenticated/admin/insights")({
   head: () => ({
     meta: [
-      { title: "KPI insights — Vellum admin" },
+      { title: "KPI insights — Holiday Clippers admin" },
       { name: "description", content: "AI summary of possible causes and next steps for a KPI deviation." },
-      { property: "og:title", content: "KPI insights — Vellum admin" },
+      { property: "og:title", content: "KPI insights — Holiday Clippers admin" },
       { property: "og:description", content: "AI summary of possible causes and next steps for a KPI deviation." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
