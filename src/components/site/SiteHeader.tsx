@@ -80,8 +80,8 @@ export function SiteFooter() {
           Holiday Clippers — open distribution for independent travel
         </span>
         <nav className="flex flex-wrap items-center gap-x-4 gap-y-1">
-          <Link to="/terms" className="hover:text-ink">Algemene Voorwaarden</Link>
-          <Link to="/privacy" className="hover:text-ink">Privacyverklaring</Link>
+          <Link to="/terms" className="hover:text-ink">Terms and Conditions</Link>
+          <Link to="/privacy" className="hover:text-ink">Privacy Statement</Link>
           <a href={`mailto:${LEGAL_ENTITY.email}`} className="hover:text-ink">{LEGAL_ENTITY.email}</a>
         </nav>
       </div>
