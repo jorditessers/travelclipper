@@ -10,7 +10,7 @@ export function LegalCheckbox({ checked, onChange }: { checked: boolean; onChang
         <Link to="/terms" target="_blank" className="underline underline-offset-2 hover:text-moss">Terms and Conditions</Link>{" "}
         and have read the{" "}
         <Link to="/privacy" target="_blank" className="underline underline-offset-2 hover:text-moss">Privacy Statement</Link>.
-        <span className="block text-[11px] text-ink/50">Both documents are in Dutch. This platform is for business users only.</span>
+        <span className="block text-[11px] text-ink/50">This platform is for business users only.</span>
       </span>
     </label>
   );

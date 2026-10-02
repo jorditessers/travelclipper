@@ -1,19 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CompanyDetails, LegalPage } from "@/components/site/LegalPage";
-import { TERMS_BLOCKS } from "@/lib/legal-content";
+import { LegalPage } from "@/components/site/LegalPage";
+import { TERMS_BLOCKS, TERMS_BLOCKS_NL } from "@/lib/legal-content";
 import { LEGAL_ENTITY, TERMS_VERSION } from "@/lib/legal";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: `Algemene Voorwaarden — ${LEGAL_ENTITY.platformName}` },
-      { name: "description", content: `Algemene Voorwaarden voor zakelijke gebruikers van ${LEGAL_ENTITY.platformName}.` },
-      { property: "og:title", content: `Algemene Voorwaarden — ${LEGAL_ENTITY.platformName}` },
+      { title: `Terms and Conditions — ${LEGAL_ENTITY.platformName}` },
+      { name: "description", content: `Terms and Conditions for business users of ${LEGAL_ENTITY.platformName}.` },
+      { property: "og:title", content: `Terms and Conditions — ${LEGAL_ENTITY.platformName}` },
       { property: "og:type", content: "website" },
     ],
   }),
   component: () => (
-    <LegalPage title="Algemene Voorwaarden" subtitle="B2B Travel Distribution Platform" version={TERMS_VERSION} blocks={TERMS_BLOCKS}
-      intro={<CompanyDetails fields={["platformName", "legalName", "coc", "vat", "address", "email"]} />} />
+    <LegalPage subtitle="B2B Travel Distribution Platform" version={TERMS_VERSION}
+      en={{ title: "Terms and Conditions", blocks: TERMS_BLOCKS }} nl={{ title: "Algemene Voorwaarden", blocks: TERMS_BLOCKS_NL }}
+      companyFields={["platformName", "legalName", "coc", "vat", "address", "email"]} />
   ),
 });
