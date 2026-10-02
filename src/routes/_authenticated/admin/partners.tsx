@@ -13,9 +13,9 @@ import { isLocalDemo } from "@/integrations/demo-backend/mode";
 export const Route = createFileRoute("/_authenticated/admin/partners")({
   head: () => ({
     meta: [
-      { title: "Distribution Partners — Vellum admin" },
+      { title: "Distribution Partners — Holiday Clippers admin" },
       { name: "description", content: "Distribution Partners and their performance." },
-      { property: "og:title", content: "Distribution Partners — Vellum admin" },
+      { property: "og:title", content: "Distribution Partners — Holiday Clippers admin" },
       { property: "og:description", content: "Distribution Partners and their performance." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

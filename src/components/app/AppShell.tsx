@@ -23,8 +23,8 @@ import { DemoLayer } from "./DemoMode";
 function Brand() {
   return (
     <Link to="/" className="flex items-center gap-2.5">
-      <span className="grid size-8 place-items-center rounded-full bg-ink font-display text-[15px] text-paper">V</span>
-      <span className="font-display text-lg font-medium tracking-tight">Vellum</span>
+      <span className="grid size-8 place-items-center rounded-full bg-ink font-display text-[15px] text-paper">H</span>
+      <span className="font-display text-lg font-medium tracking-tight">Holiday Clippers</span>
     </Link>
   );
 }

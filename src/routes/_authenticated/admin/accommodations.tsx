@@ -14,9 +14,9 @@ import { isLocalDemo } from "@/integrations/demo-backend/mode";
 export const Route = createFileRoute("/_authenticated/admin/accommodations")({
   head: () => ({
     meta: [
-      { title: "Accommodations — Vellum admin" },
+      { title: "Accommodations — Holiday Clippers admin" },
       { name: "description", content: "All stays on the platform and their status." },
-      { property: "og:title", content: "Accommodations — Vellum admin" },
+      { property: "og:title", content: "Accommodations — Holiday Clippers admin" },
       { property: "og:description", content: "All stays on the platform and their status." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

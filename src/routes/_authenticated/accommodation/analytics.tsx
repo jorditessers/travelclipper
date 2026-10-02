@@ -6,9 +6,9 @@ import { PlaceholderPage } from "@/components/app/PlaceholderPage";
 export const Route = createFileRoute("/_authenticated/accommodation/analytics")({
   head: () => ({
     meta: [
-      { title: "Analytics — Vellum" },
+      { title: "Analytics — Holiday Clippers" },
       { name: "description", content: "Clicks, bookings and partner performance." },
-      { property: "og:title", content: "Analytics — Vellum" },
+      { property: "og:title", content: "Analytics — Holiday Clippers" },
       { property: "og:description", content: "Clicks, bookings and partner performance." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

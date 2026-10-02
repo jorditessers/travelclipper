@@ -16,5 +16,7 @@ export default defineConfig({
     // PGlite (the browser demo database) loads its own WebAssembly and data files.
     optimizeDeps: { exclude: ["@electric-sql/pglite"] },
     worker: { format: "es" },
+    // Public Supabase settings may also come from the Vercel integration as NEXT_PUBLIC_*.
+    envPrefix: ["VITE_", "NEXT_PUBLIC_"],
   },
 });

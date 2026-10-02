@@ -36,9 +36,9 @@ export const Route = createFileRoute("/_authenticated/distribution/discover")({
   validateSearch: zodValidator(schema),
   head: () => ({
     meta: [
-      { title: "Discover stays — Vellum" },
+      { title: "Discover stays — Holiday Clippers" },
       { name: "description", content: "Find commissionable stays that fit your audience." },
-      { property: "og:title", content: "Discover stays — Vellum" },
+      { property: "og:title", content: "Discover stays — Holiday Clippers" },
       { property: "og:description", content: "Find commissionable stays that fit your audience." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

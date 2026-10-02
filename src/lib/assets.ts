@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { isLocalDemo } from "@/integrations/demo-backend/mode";
 import type { Database } from "@/integrations/supabase/types";
+import { supabaseEnv } from "@/integrations/demo-backend/mode";
 
 export type AssetType = Database["public"]["Enums"]["asset_type"];
 export type Asset = Database["public"]["Tables"]["accommodation_assets"]["Row"];
@@ -72,12 +73,12 @@ export async function uploadWithProgress(path: string, file: File, mime: string,
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
   if (!token) throw new Error("Not signed in");
-  const url = `${import.meta.env['VITE_SUPABASE_URL']}/storage/v1/object/${ASSET_BUCKET}/${path}`;
+  const url = `${supabaseEnv().url}/storage/v1/object/${ASSET_BUCKET}/${path}`;
   await new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", url);
     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-    xhr.setRequestHeader("apikey", import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY']);
+    xhr.setRequestHeader("apikey", supabaseEnv().key ?? "");
     xhr.setRequestHeader("Content-Type", mime);
     xhr.setRequestHeader("x-upsert", "false");
     xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(Math.round((e.loaded / e.total) * 100));

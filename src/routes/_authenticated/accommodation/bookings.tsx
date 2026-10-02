@@ -13,9 +13,9 @@ import { RegisterBookingDialog } from "@/components/bookings/RegisterBookingDial
 export const Route = createFileRoute("/_authenticated/accommodation/bookings")({
   head: () => ({
     meta: [
-      { title: "Bookings — Vellum" },
+      { title: "Bookings — Holiday Clippers" },
       { name: "description", content: "Attributed bookings and their commission snapshots." },
-      { property: "og:title", content: "Bookings — Vellum" },
+      { property: "og:title", content: "Bookings — Holiday Clippers" },
       { property: "og:description", content: "Attributed bookings and their commission snapshots." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

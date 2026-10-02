@@ -15,9 +15,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/onboarding/distribution")({
   head: () => ({
     meta: [
-      { title: "Set up your distribution profile — Vellum" },
+      { title: "Set up your distribution profile — Holiday Clippers" },
       { name: "description", content: "Tell accommodations who you are and who you reach." },
-      { property: "og:title", content: "Set up your distribution profile — Vellum" },
+      { property: "og:title", content: "Set up your distribution profile — Holiday Clippers" },
       { property: "og:description", content: "Tell accommodations who you are and who you reach." },
       { name: "robots", content: "noindex" },
     ],

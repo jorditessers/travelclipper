@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { supabaseEnv, supabaseServiceKey } from "@/integrations/demo-backend/mode";
 
 /**
  * Signs in to one of the seeded demo accounts. Public on purpose (used from the login page),
@@ -10,8 +11,9 @@ export const startDemoSession = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { createClient } = await import("@supabase/supabase-js");
     const { DEMO_TOUR } = await import("./demo-seed-data");
-    const url = process.env["SUPABASE_URL"]!;
-    const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
+    const { url: u, key: k } = supabaseEnv();
+    const url = u!;
+    const key = k!;
     const password = process.env["DEMO_LOGIN_PASSWORD"];
     if (!password) throw new Error("The demo isn't set up yet.");
     const client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false, storage: undefined } });

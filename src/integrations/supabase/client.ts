@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { brokeredPreviewStorage } from './previewAuthStorage';
-import { DEMO_ANON_KEY, DEMO_SUPABASE_URL } from '@/integrations/demo-backend/mode';
+import { DEMO_ANON_KEY, DEMO_SUPABASE_URL, supabaseEnv } from '@/integrations/demo-backend/mode';
 
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith('sb_publishable_') || value.startsWith('sb_secret_');
@@ -32,8 +32,7 @@ export const NOT_CONFIGURED_MESSAGE = "Accounts and data aren't available in thi
 
 /** False when the site runs without a database (no Supabase variables set). */
 export function isSupabaseConfigured(): boolean {
-  const url = import.meta.env['VITE_SUPABASE_URL'] || (typeof process !== 'undefined' ? process.env['SUPABASE_URL'] : undefined);
-  const key = import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'] || (typeof process !== 'undefined' ? process.env['SUPABASE_PUBLISHABLE_KEY'] : undefined);
+  const { url, key } = supabaseEnv();
   return !!(url && key);
 }
 
@@ -48,9 +47,7 @@ const notConfiguredFetch: typeof fetch = async () =>
 function createSupabaseClient() {
   // Use import.meta.env for client-side (Vite build-time replacement)
   // Fall back to process.env for SSR (server-side rendering)
-  const env = typeof process !== 'undefined' ? process.env : {};
-  const SUPABASE_URL = import.meta.env['VITE_SUPABASE_URL'] || env['SUPABASE_URL'];
-  const SUPABASE_PUBLISHABLE_KEY = import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'] || env['SUPABASE_PUBLISHABLE_KEY'];
+  const { url: SUPABASE_URL, key: SUPABASE_PUBLISHABLE_KEY } = supabaseEnv();
 
   if ((!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) && !import.meta.env.SSR && typeof window !== 'undefined') {
     return createLocalDemoClient();

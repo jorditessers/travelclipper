@@ -19,9 +19,9 @@ export const Route = createFileRoute("/_authenticated/accommodation/accommodatio
   validateSearch: search,
   head: () => ({
     meta: [
-      { title: "Accommodation — Vellum" },
+      { title: "Accommodation — Holiday Clippers" },
       { name: "description", content: "Details and content library for your stay." },
-      { property: "og:title", content: "Accommodation — Vellum" },
+      { property: "og:title", content: "Accommodation — Holiday Clippers" },
       { property: "og:description", content: "Details and content library for your stay." },
       { name: "robots", content: "noindex" },
     ],

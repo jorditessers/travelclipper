@@ -33,9 +33,9 @@ export const Route = createFileRoute("/_authenticated/distribution/dashboard")({
   validateSearch: zodValidator(z.object({ period: fallback(z.enum(["30", "90", "all"]), "30").default("30") })),
   head: () => ({
     meta: [
-      { title: "Your Distribution Performance — Vellum" },
+      { title: "Your Distribution Performance — Holiday Clippers" },
       { name: "description", content: "Clicks, bookings and commission from your distribution links." },
-      { property: "og:title", content: "Your Distribution Performance — Vellum" },
+      { property: "og:title", content: "Your Distribution Performance — Holiday Clippers" },
       { property: "og:description", content: "Clicks, bookings and commission from your distribution links." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -168,7 +168,7 @@ function DemoFlowDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (
   const nodes = [
     { label: "Accommodation", name: b?.accommodation_name ?? "The accommodation",
       line: "Supplies the stay and content, sets the commission pool.", amount: b ? `Receives ${eur(b.booking_value)} · pays ${eur(b.commission_total)} (${Number(b.commission_pool_pct ?? 0)}%)` : null },
-    { label: "Platform", name: "Vellum",
+    { label: "Platform", name: "Holiday Clippers",
       line: "Infrastructure: listings, content, tracking and attribution.", amount: b ? `Keeps ${eur(b.platform_commission)}` : null },
     { label: "Distribution Partner", name: b?.partner_brand ?? "The partner",
       line: "Brings the audience and the trust.", amount: b ? `Earns ${eur(b.partner_commission)}` : null },

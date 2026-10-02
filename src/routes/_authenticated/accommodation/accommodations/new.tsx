@@ -4,9 +4,9 @@ import { AccommodationWizard } from "@/components/accommodations/AccommodationWi
 export const Route = createFileRoute("/_authenticated/accommodation/accommodations/new")({
   head: () => ({
     meta: [
-      { title: "Add accommodation — Vellum" },
+      { title: "Add accommodation — Holiday Clippers" },
       { name: "description", content: "Add a stay to make it available to distribution partners." },
-      { property: "og:title", content: "Add accommodation — Vellum" },
+      { property: "og:title", content: "Add accommodation — Holiday Clippers" },
       { property: "og:description", content: "Add a stay to make it available to distribution partners." },
       { name: "robots", content: "noindex" },
     ],

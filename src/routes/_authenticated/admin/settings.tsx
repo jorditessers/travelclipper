@@ -12,9 +12,9 @@ import { friendlyError } from "@/lib/errors";
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   head: () => ({
     meta: [
-      { title: "Settings — Vellum admin" },
+      { title: "Settings — Holiday Clippers admin" },
       { name: "description", content: "Platform commission split and demo data." },
-      { property: "og:title", content: "Settings — Vellum admin" },
+      { property: "og:title", content: "Settings — Holiday Clippers admin" },
       { property: "og:description", content: "Platform commission split and demo data." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

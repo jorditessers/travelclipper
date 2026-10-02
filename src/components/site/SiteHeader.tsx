@@ -7,9 +7,9 @@ export function Brand() {
   return (
     <Link to="/" className="flex items-center gap-2.5">
       <span className="grid size-8 place-items-center rounded-full bg-ink font-display text-[15px] text-paper">
-        V
+        H
       </span>
-      <span className="font-display text-lg font-medium tracking-tight text-ink">Vellum</span>
+      <span className="font-display text-lg font-medium tracking-tight text-ink">Holiday Clippers</span>
     </Link>
   );
 }
@@ -77,7 +77,7 @@ export function SiteFooter() {
     <footer className="border-t border-ink/10 bg-paper/60 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-[12px] text-ink/50 sm:flex-row">
         <span className="font-display text-sm text-ink/70">
-          Vellum — open distribution for independent travel
+          Holiday Clippers — open distribution for independent travel
         </span>
         <nav className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <Link to="/terms" className="hover:text-ink">Algemene Voorwaarden</Link>

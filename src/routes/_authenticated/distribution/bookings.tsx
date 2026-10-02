@@ -9,9 +9,9 @@ import { BookingStatusBadge, ReportBookingDialog, eur, stayRange } from "@/compo
 export const Route = createFileRoute("/_authenticated/distribution/bookings")({
   head: () => ({
     meta: [
-      { title: "Bookings — Vellum" },
+      { title: "Bookings — Holiday Clippers" },
       { name: "description", content: "Bookings you generated and the commission you earn." },
-      { property: "og:title", content: "Bookings — Vellum" },
+      { property: "og:title", content: "Bookings — Holiday Clippers" },
       { property: "og:description", content: "Bookings you generated and the commission you earn." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

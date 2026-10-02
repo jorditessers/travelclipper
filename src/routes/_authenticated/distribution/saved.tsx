@@ -11,9 +11,9 @@ import { STAY_SELECT, StayCard, countryName, toStayCards, useToggleSave } from "
 export const Route = createFileRoute("/_authenticated/distribution/saved")({
   head: () => ({
     meta: [
-      { title: "Saved stays — Vellum" },
+      { title: "Saved stays — Holiday Clippers" },
       { name: "description", content: "Stays you've shortlisted to promote." },
-      { property: "og:title", content: "Saved stays — Vellum" },
+      { property: "og:title", content: "Saved stays — Holiday Clippers" },
       { property: "og:description", content: "Stays you've shortlisted to promote." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -10,10 +10,10 @@ import { Brand } from "@/components/site/SiteHeader";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Set a new password — Vellum" },
-      { name: "description", content: "Choose a new password for your Vellum account." },
-      { property: "og:title", content: "Set a new password — Vellum" },
-      { property: "og:description", content: "Choose a new password for your Vellum account." },
+      { title: "Set a new password — Holiday Clippers" },
+      { name: "description", content: "Choose a new password for your Holiday Clippers account." },
+      { property: "og:title", content: "Set a new password — Holiday Clippers" },
+      { property: "og:description", content: "Choose a new password for your Holiday Clippers account." },
       { name: "robots", content: "noindex" },
     ],
   }),

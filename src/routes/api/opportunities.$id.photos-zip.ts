@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { Zip, ZipPassThrough } from "fflate";
 import type { Database } from "@/integrations/supabase/types";
+import { supabaseEnv, supabaseServiceKey } from "@/integrations/demo-backend/mode";
 
 const MAX_PHOTOS = 50;
 const UUID = /^[0-9a-f-]{36}$/i;
@@ -13,9 +14,10 @@ export const Route = createFileRoute("/api/opportunities/$id/photos-zip")({
         const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
         if (!token) return new Response("Unauthorized", { status: 401 });
         if (!UUID.test(params.id)) return new Response("Not found", { status: 404 });
-        const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
+        const { url: sbUrl, key: sbKey } = supabaseEnv();
+        const key = sbKey!;
         // Acts as the signed-in user: table RLS + storage policies decide what is readable.
-        const sb = createClient<Database>(process.env["SUPABASE_URL"]!, key, {
+        const sb = createClient<Database>(sbUrl!, key, {
           auth: { persistSession: false, autoRefreshToken: false },
           global: { headers: { Authorization: `Bearer ${token}` } },
         });
