@@ -38,6 +38,15 @@ function Page() {
     queryKey: ["admin-users", exclude],
     queryFn: async () => { const { data, error } = await supabase.rpc("admin_list_users", { _exclude_demo: exclude }); if (error) throw error; return data as UserRow[]; },
   });
+  // Step-by-step onboarding answers (also for people who stopped halfway).
+  const drafts = useQuery({
+    queryKey: ["admin-onboarding-drafts"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("onboarding_drafts").select("user_id, role, step, answers, completed_at, updated_at");
+      if (error) return new Map<string, Draft>(); // table not created yet: just show no drafts
+      return new Map((data as Draft[]).map((d) => [d.user_id, d]));
+    },
+  });
   const rows = useMemo(() => (q.data ?? []).filter((u) =>
     (!role || (role === "none" ? !u.role : u.role === role)) &&
     (!term || [u.email, u.first_name, u.last_name, u.company_name].join(" ").toLowerCase().includes(term.toLowerCase()))), [q.data, role, term]);
@@ -57,20 +66,60 @@ function Page() {
         : (
           <DataTable columns={["User", "Role", "Onboarding", "Joined", ""]}
             rows={rows.map((u) => [
-              <div key="u"><p className="font-medium">{[u.first_name, u.last_name].filter(Boolean).join(" ") || u.company_name || u.display_name || "—"}</p>
+              <div key="u"><p className="font-medium">{displayName(u, drafts.data?.get(u.id)) || "—"}</p>
                 <p className="text-[12px] text-muted-foreground">{u.email}{u.is_demo ? " · demo" : ""}</p></div>,
               <span key="r">{u.role ? ROLE_TEXT[u.role] : <span className="text-muted-foreground">No role yet</span>}</span>,
-              <Badge key="o" tone={u.onboarding_completed ? "moss" : "clay"}>{u.onboarding_completed ? "Completed" : "Not completed"}</Badge>,
+              <Badge key="o" tone={u.onboarding_completed ? "moss" : "clay"}>{onboardingStatus(u, drafts.data?.get(u.id))}</Badge>,
               <span key="j" className="text-muted-foreground">{fmtDate(u.created_at)}</span>,
               <Button key="v" size="sm" variant="outline" onClick={() => setOpen(u)}>View profile</Button>,
             ])} />
         )}
-      <ProfileSheet user={open} onClose={() => setOpen(null)} />
+      <ProfileSheet user={open} draft={open ? drafts.data?.get(open.id) : undefined} onClose={() => setOpen(null)} />
     </div>
   );
 }
 
-function ProfileSheet({ user, onClose }: { user: UserRow | null; onClose: () => void }) {
+type Draft = { user_id: string; role: string; step: number; answers: Record<string, unknown>; completed_at: string | null; updated_at: string };
+
+const DRAFT_STEPS: Record<string, string[]> = {
+  accommodation_partner: ["Contact", "Business", "Goals", "Terms"],
+  distribution_partner: ["Distribution type", "Profile", "Terms"],
+};
+
+/** Profile name, or the name typed during an unfinished onboarding. */
+function displayName(u: UserRow, d: Draft | undefined) {
+  const own = [u.first_name, u.last_name].filter(Boolean).join(" ") || u.company_name || u.display_name;
+  if (own) return own;
+  const a = d?.answers ?? {};
+  const str = (k: string) => (typeof a[k] === "string" ? (a[k] as string).trim() : "");
+  return [str("first_name"), str("last_name")].filter(Boolean).join(" ") || str("company_name") || str("brand");
+}
+
+function onboardingStatus(u: UserRow, d: Draft | undefined) {
+  if (u.onboarding_completed) return "Completed";
+  const steps = d && DRAFT_STEPS[d.role];
+  return steps ? `Step ${d.step} of ${steps.length} · ${steps[d.step - 1] ?? ""}` : "Not started";
+}
+
+const DRAFT_LABELS: Record<string, string> = {
+  first_name: "First name", last_name: "Last name", company_name: "Company", country: "Country",
+  business_type: "Business type", website: "Website", band: "Accommodations (stated)", goals: "Goals",
+  type: "Type", brand: "Brand", socials: "Social links", markets: "Markets", niches: "Niches", reach: "Reach", bio: "Bio",
+};
+
+function draftValue(k: string, v: unknown): string {
+  const list = Array.isArray(v) ? v.filter((x) => typeof x === "string" && x.trim()) as string[] : null;
+  if (k === "country" && typeof v === "string") return marketLabel(v);
+  if (k === "markets" && list) return list.map(marketLabel).join(", ");
+  if (k === "niches" && list) return list.map((n) => nicheLabel(n as Parameters<typeof nicheLabel>[0])).join(", ");
+  if (k === "type" && typeof v === "string" && v) return distributionTypeLabel(v as Parameters<typeof distributionTypeLabel>[0]);
+  if (k === "reach" && typeof v === "string" && v) return REACH_LABEL[v as keyof typeof REACH_LABEL] ?? v;
+  if (list) return list.map((x) => x.replace(/_/g, " ")).join(", ");
+  if (typeof v === "string") return k === "band" ? v.replace("_plus", "+").replace("_", "–") : k === "business_type" ? v.replace(/_/g, " ") : v;
+  return "";
+}
+
+function ProfileSheet({ user, draft, onClose }: { user: UserRow | null; draft: Draft | undefined; onClose: () => void }) {
   const q = useQuery({
     queryKey: ["admin-user-profile", user?.id, user?.role],
     enabled: !!user && (user.role === "distribution_partner" || user.role === "accommodation_partner"),
@@ -110,7 +159,7 @@ function ProfileSheet({ user, onClose }: { user: UserRow | null; onClose: () => 
       <SheetContent className="overflow-y-auto sm:max-w-md">
         {user && <>
           <SheetHeader>
-            <SheetTitle className="font-display text-2xl">{[user.first_name, user.last_name].filter(Boolean).join(" ") || user.company_name || "User"}</SheetTitle>
+            <SheetTitle className="font-display text-2xl">{displayName(user, draft) || "User"}</SheetTitle>
             <SheetDescription>{user.email}</SheetDescription>
           </SheetHeader>
           <div className="mt-6 space-y-6">
@@ -118,7 +167,7 @@ function ProfileSheet({ user, onClose }: { user: UserRow | null; onClose: () => 
               {row("Role", user.role ? ROLE_TEXT[user.role] : "No role yet")}
               {row("Company", user.company_name)}
               {row("Country", user.country && marketLabel(user.country))}
-              {row("Onboarding", user.onboarding_completed ? "Completed" : "Not completed")}
+              {row("Onboarding", onboardingStatus(user, draft))}
               {row("Commission terms (onboarding)", fmtDate(user.terms_accepted_at))}
               {(["terms", "privacy"] as const).map((d) => {
                 const a = legal.data?.find((x) => x.document === d);
@@ -128,6 +177,15 @@ function ProfileSheet({ user, onClose }: { user: UserRow | null; onClose: () => 
               {row("Joined", fmtDate(user.created_at))}
               {row("Demo account", user.is_demo ? "Yes" : "No")}
             </div>
+            {draft && !user.onboarding_completed && (
+              <div>
+                <p className="eyebrow mb-2">Onboarding answers so far</p>
+                {Object.keys(DRAFT_LABELS).filter((k) => k in draft.answers).map((k) => (
+                  <div key={k}>{row(DRAFT_LABELS[k]!, draftValue(k, draft.answers[k]))}</div>
+                ))}
+                {row("Last saved", new Date(draft.updated_at).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }))}
+              </div>
+            )}
             {q.isLoading && <Skeleton className="h-40" />}
             {q.error && <p className="text-sm text-muted-foreground">We couldn't load the partner profile. Close and try again.</p>}
             {q.data?.kind === "dp" && (q.data.dp ? (

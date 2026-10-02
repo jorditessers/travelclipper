@@ -1,7 +1,7 @@
 import { friendlyError } from "@/lib/errors";
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { BookOpen, Briefcase, Camera, Gem, Newspaper, Users, type LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import { ChipMultiSelect, Field, TextInput } from "@/components/app/ui-kit";
 import { MARKETS, NICHES, REACH_BANDS, type DistributionType, type Niche, type ReachBand } from "@/lib/constants";
 import { accessQuery, homeFor } from "@/lib/access";
 import { cn } from "@/lib/utils";
+import { loadOnboardingDraft, saveOnboardingDraft } from "@/lib/onboarding-draft";
 
 export const Route = createFileRoute("/_authenticated/onboarding/distribution")({
   head: () => ({
@@ -80,6 +81,8 @@ function Page() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [f, setF] = useState<Form>(EMPTY);
+  const fRef = useRef(f);
+  fRef.current = f;
 
   useEffect(() => {
     try {
@@ -88,8 +91,16 @@ function Page() {
         const s = JSON.parse(raw);
         setF({ ...EMPTY, ...s.f });
         setStep(Math.min(Math.max(0, s.step ?? 0), 2));
+        return;
       }
     } catch { /* ignore */ }
+    // Nothing in this tab: pick up where the user left off, e.g. on another device.
+    void loadOnboardingDraft("distribution_partner").then((d) => {
+      // Only if the user hasn't started typing in the meantime.
+      if (!d || JSON.stringify(fRef.current) !== JSON.stringify(EMPTY)) return;
+      setF({ ...EMPTY, ...(d.answers as Partial<Form>), terms: false });
+      setStep(Math.min(Math.max(0, d.step - 1), 2));
+    });
   }, []);
   useEffect(() => {
     sessionStorage.setItem(STORE, JSON.stringify({ f, step }));
@@ -113,6 +124,7 @@ function Page() {
         _accept_terms: f.terms,
       });
       if (error) throw error;
+      await saveOnboardingDraft("distribution_partner", 3, f, true);
     },
     onSuccess: async () => {
       sessionStorage.removeItem(STORE);
@@ -130,8 +142,10 @@ function Page() {
       toast.error(e);
       return;
     }
-    if (step < 2) setStep(step + 1);
-    else m.mutate();
+    if (step < 2) {
+      void saveOnboardingDraft("distribution_partner", step + 2, f);
+      setStep(step + 1);
+    } else m.mutate();
   };
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setF((p) => ({ ...p, [k]: v }));
