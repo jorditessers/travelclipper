@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { supabaseEnv, supabaseServiceKey } from "@/integrations/demo-backend/mode";
 
 const CODE = /^[A-Za-z]{3}-[A-Za-z0-9]{5}$/;
 
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/go/$code")({
       GET: async ({ request, params }) => {
         if (!CODE.test(params.code)) return inactive();
         // No database connected: the browser demo records the click itself.
-        if (!process.env["SUPABASE_URL"] || !process.env["SUPABASE_SERVICE_ROLE_KEY"]) {
+        if (!supabaseEnv().url || !supabaseServiceKey()) {
           return new Response(null, { status: 302, headers: { location: `/demo-link/${params.code}`, "cache-control": "no-store" } });
         }
         const h = request.headers;
