@@ -1,7 +1,7 @@
 import { friendlyError } from "@/lib/errors";
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import { ChipMultiSelect, Field, NativeSelect, TextInput } from "@/components/ap
 import { ACCOMMODATION_COUNT_BANDS, AP_BUSINESS_TYPES, AP_GOALS, MARKETS } from "@/lib/constants";
 import { accessQuery, homeFor } from "@/lib/access";
 import { cn } from "@/lib/utils";
+import { loadOnboardingDraft, saveOnboardingDraft } from "@/lib/onboarding-draft";
 import type { AccommodationCountBand as CountBand, ApBusinessType as BusinessType, ApGoal as Goal } from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/onboarding/accommodation")({
@@ -74,6 +75,8 @@ function Page() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [f, setF] = useState<Form>(EMPTY);
+  const fRef = useRef(f);
+  fRef.current = f;
   const [done, setDone] = useState(false);
 
   useEffect(() => {
@@ -83,8 +86,16 @@ function Page() {
         const s = JSON.parse(raw);
         setF({ ...EMPTY, ...s.f });
         setStep(Math.min(Math.max(0, s.step ?? 0), 3));
+        return;
       }
     } catch { /* ignore */ }
+    // Nothing in this tab: pick up where the user left off, e.g. on another device.
+    void loadOnboardingDraft("accommodation_partner").then((d) => {
+      // Only if the user hasn't started typing in the meantime.
+      if (!d || JSON.stringify(fRef.current) !== JSON.stringify(EMPTY)) return;
+      setF({ ...EMPTY, ...(d.answers as Partial<Form>), terms: false });
+      setStep(Math.min(Math.max(0, d.step - 1), 3));
+    });
   }, []);
   useEffect(() => {
     if (!done) sessionStorage.setItem(STORE, JSON.stringify({ f, step }));
@@ -108,6 +119,7 @@ function Page() {
         _accept_terms: f.terms,
       });
       if (error) throw error;
+      await saveOnboardingDraft("accommodation_partner", 4, f, true);
     },
     onSuccess: () => {
       sessionStorage.removeItem(STORE);
@@ -123,8 +135,10 @@ function Page() {
       toast.error(e);
       return;
     }
-    if (step < 3) setStep(step + 1);
-    else m.mutate();
+    if (step < 3) {
+      void saveOnboardingDraft("accommodation_partner", step + 2, f);
+      setStep(step + 1);
+    } else m.mutate();
   };
 
   const goToFirstStay = async () => {

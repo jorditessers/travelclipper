@@ -731,6 +731,36 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_drafts: {
+        Row: {
+          answers: Json
+          completed_at: string | null
+          created_at: string
+          role: string
+          step: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          completed_at?: string | null
+          created_at?: string
+          role: string
+          step: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          completed_at?: string | null
+          created_at?: string
+          role?: string
+          step?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           demo_baseline_at: string | null
