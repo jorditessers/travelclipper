@@ -5,16 +5,40 @@ import { LEGAL_ENTITY } from "@/lib/legal";
 import type { Database } from "@/integrations/supabase/types";
 
 type OutboxRow = Database["public"]["Tables"]["email_outbox"]["Row"];
-type Email = { to: string[]; subject: string; html: string; text: string };
+type Email = { to: string[]; subject: string; html: string; text: string; headers?: Record<string, string> };
 
 const siteUrl = () => (process.env["SITE_URL"] ?? "https://www.holidayclippers.com").replace(/\/+$/, "");
 const fromAddress = () => process.env["EMAIL_FROM"] ?? "Holiday Clippers <hello@holidayclippers.com>";
+
+async function linkToken(userId: string) {
+  const { createHmac } = await import("node:crypto");
+  const secret = process.env["EMAIL_LINK_SECRET"] ?? process.env["SUPABASE_SERVICE_ROLE_KEY"] ?? "";
+  return createHmac("sha256", `unsubscribe:${secret}`).update(userId).digest("hex").slice(0, 32);
+}
+
+/** Signed link that unsubscribes one user from the onboarding tips. */
+export async function unsubscribeUrl(userId: string) {
+  return `${siteUrl()}/api/email/unsubscribe?u=${encodeURIComponent(userId)}&t=${await linkToken(userId)}`;
+}
+
+export async function verifyUnsubscribe(userId: string, token: string) {
+  const { timingSafeEqual } = await import("node:crypto");
+  const expected = Buffer.from(await linkToken(userId));
+  const given = Buffer.from(token);
+  return given.length === expected.length && timingSafeEqual(given, expected);
+}
+
+export async function unsubscribeFromTips(userId: string) {
+  const now = new Date().toISOString();
+  const { error } = await supabaseAdmin.from("email_preferences").upsert({ user_id: userId, tips_opted_out_at: now, updated_at: now }, { onConflict: "user_id" });
+  if (error) throw new Error(error.message);
+}
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
 /** One branded layout for every email: heading, paragraphs, optional button. Inputs are plain text. */
-export function layout(o: { heading: string; paragraphs: string[]; button?: { label: string; url: string }; footnote?: string }): { html: string; text: string } {
+export function layout(o: { heading: string; paragraphs: string[]; button?: { label: string; url: string }; footnote?: string; unsubscribeUrl?: string }): { html: string; text: string } {
   const p = o.paragraphs.map((t) => `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4a453f">${esc(t).replace(/\n/g, "<br>")}</p>`).join("");
   const btn = o.button
     ? `<p style="margin:28px 0"><a href="${esc(o.button.url)}" style="display:inline-block;background:#2a2621;color:#f4f0e6;text-decoration:none;padding:12px 24px;border-radius:999px;font-size:15px">${esc(o.button.label)}</a></p>`
@@ -28,9 +52,9 @@ export function layout(o: { heading: string; paragraphs: string[]; button?: { la
 <h1 style="margin:0 0 20px;font-family:Georgia,serif;font-weight:normal;font-size:28px;line-height:1.2;color:#2a2621">${esc(o.heading)}</h1>
 ${p}${btn}${foot}
 </td></tr></table>
-<p style="margin:20px 0 0;font-size:12px;color:#8a847b">${esc(LEGAL_ENTITY.platformName)} · <a href="${esc(siteUrl())}" style="color:#8a847b">${esc(siteUrl().replace(/^https?:\/\//, ""))}</a> · Questions? Just reply to this email.</p>
+<p style="margin:20px 0 0;font-size:12px;color:#8a847b">${esc(LEGAL_ENTITY.platformName)} · <a href="${esc(siteUrl())}" style="color:#8a847b">${esc(siteUrl().replace(/^https?:\/\//, ""))}</a> · Questions? Just reply to this email.${o.unsubscribeUrl ? `<br>Don't want these tips? <a href="${esc(o.unsubscribeUrl)}" style="color:#8a847b">Unsubscribe</a>` : ""}</p>
 </td></tr></table></body></html>`;
-  const text = [o.heading, "", ...o.paragraphs.flatMap((t) => [t, ""]), ...(o.button ? [`${o.button.label}: ${o.button.url}`, ""] : []), ...(o.footnote ? [o.footnote] : [])].join("\n");
+  const text = [o.heading, "", ...o.paragraphs.flatMap((t) => [t, ""]), ...(o.button ? [`${o.button.label}: ${o.button.url}`, ""] : []), ...(o.footnote ? [o.footnote] : []), ...(o.unsubscribeUrl ? ["", `Don't want these tips? Unsubscribe: ${o.unsubscribeUrl}`] : [])].join("\n");
   return { html, text };
 }
 
@@ -52,6 +76,71 @@ async function adminEmails(): Promise<string[]> {
   return [...new Set([...(profiles ?? []).map((p) => p.email).filter((e): e is string => !!e), ...extra])];
 }
 
+/** Onboarding tips (day 2, 5 and 10). Which ones are due is decided by enqueue_tip_emails(). */
+const TIPS: Record<string, { subject: string; heading: string; paragraphs: string[]; button: string; path: string }> = {
+  tip_ap_day2: {
+    subject: "3 things that make partners pick your stay",
+    heading: "What makes partners pick a stay",
+    paragraphs: [
+      "Distribution partners scroll through a lot of stays. The ones they pick to share usually have three things in common:",
+      "1. Photos that sell the feeling. Start with your best shot as the cover. Mix wide views with details: the terrace at sunset, breakfast, the view from bed. At least 8 photos works best.",
+      "2. A description in your own voice. Who is your stay perfect for? Couples, families, remote workers? Partners need to know straight away whether it fits their audience.",
+      "3. A clear commission. Most stays on Holiday Clippers offer a pool of 8–12%. That's less than the roughly 15% you pay on Airbnb or Booking.com, and you only pay on bookings that actually happen.",
+    ],
+    button: "Complete your stay", path: "/accommodation/accommodations",
+  },
+  tip_ap_day5: {
+    subject: "Your stay isn't live yet",
+    heading: "Your stay isn't live yet",
+    paragraphs: [
+      "You've set up your account, but your stay isn't online yet. That means partners can't find it, and they can't send you bookings.",
+      "Adding a stay takes about 15 minutes: photos, a description and your commission. Once you submit it, we review it personally, usually within 1–3 working days.",
+      "Stuck on something? Just reply to this email and we'll help.",
+    ],
+    button: "Add your stay", path: "/accommodation/accommodations/new",
+  },
+  tip_ap_day10: {
+    subject: "How commission works (with an example)",
+    heading: "How commission works",
+    paragraphs: [
+      "A quick look at how you pay commission on Holiday Clippers, so there are no surprises:",
+      "• You set a commission pool per stay, for example 10%.\n• You only pay on confirmed bookings that came through a partner's link. No bookings, no costs.\n• You check every reported booking yourself before it's confirmed.",
+      "Example: a €2,000 booking with a 10% pool means €200 commission. €140 goes to the partner who sent the guest and €60 to Holiday Clippers.",
+      "Want more partners to pick your stay? A temporary higher commission, for example in low season, helps you stand out.",
+    ],
+    button: "View your dashboard", path: "/accommodation/dashboard",
+  },
+  tip_dp_day2: {
+    subject: "How to pick stays your audience will book",
+    heading: "Pick stays your audience will book",
+    paragraphs: [
+      "The partners who earn the most share fewer stays, but they share the right ones. A few tips:",
+      "• Match your audience, not your own taste. Where do your followers or readers already travel? What's their budget?\n• Look at the commission and the price together. 8% of a €3,000 villa week earns more than 12% of a €400 city break.\n• Save first, share later. Use Save to build a shortlist, then pick the 2–3 that fit your next post, newsletter or trip.",
+    ],
+    button: "Discover stays", path: "/distribution/discover",
+  },
+  tip_dp_day5: {
+    subject: "Where to share your tracking link",
+    heading: "Where to share your tracking link",
+    paragraphs: [
+      "Your tracking link makes sure every booking you send is credited to you. Here's where it works best:",
+      "• Instagram: in your bio or a story with a link sticker, plus a short \"why I love this place\".\n• Newsletter: one stay, one story, one link. That converts better than a list of ten.\n• Blog or YouTube: add the link to your travel guides and video descriptions. Those keep earning for months.\n• Clients (for travel advisors): send the link directly in your proposal.",
+      "Tip: create a separate link per channel. Then you'll see which one works best.",
+    ],
+    button: "Go to your links", path: "/distribution/links",
+  },
+  tip_dp_day10: {
+    subject: "Your first link is one click away",
+    heading: "Your first link is one click away",
+    paragraphs: [
+      "You haven't created a tracking link yet. That's the step that turns a stay you like into commission.",
+      "Open a stay that suits your audience, click Create tracking link and share it. It takes less than a minute. Every confirmed booking through your link earns you commission, and you can follow clicks and earnings in your dashboard.",
+      "Need help choosing? Reply to this email and tell us about your audience. We'll suggest a few stays.",
+    ],
+    button: "Find a stay to share", path: "/distribution/discover",
+  },
+};
+
 /** The emails one outbox row stands for (the user's email, plus a heads-up to the admins where useful). */
 async function buildEmails(row: OutboxRow): Promise<Email[]> {
   const u = await userInfo(row.user_id);
@@ -62,6 +151,18 @@ async function buildEmails(row: OutboxRow): Promise<Email[]> {
   const push = (to: string[], subject: string, body: Parameters<typeof layout>[0]) => {
     if (to.length) out.push({ to, subject, ...layout(body) });
   };
+
+  if (row.kind.startsWith("tip_")) {
+    const tip = TIPS[row.kind];
+    if (!tip) return out;
+    const unsub = await unsubscribeUrl(row.user_id);
+    out.push({
+      to: [u.email], subject: tip.subject,
+      ...layout({ heading: tip.heading, paragraphs: [hi, ...tip.paragraphs], button: { label: tip.button, url: `${site}${tip.path}` }, unsubscribeUrl: unsub }),
+      headers: { "List-Unsubscribe": `<${unsub}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" },
+    });
+    return out;
+  }
 
   if (row.kind === "welcome") {
     if (u.role === "accommodation_partner") {
@@ -192,7 +293,7 @@ async function buildEmails(row: OutboxRow): Promise<Email[]> {
       paragraphs: [
         hi,
         `Thanks for submitting ${acc.name}. It's now pending review.`,
-        "We check every stay before it goes live, to keep the quality high for distribution partners. You'll get an email as soon as it's approved, or if we need anything else from you.",
+        "We check every stay before it goes live, to keep the quality high for distribution partners. This usually takes 1–3 working days. You'll get an email as soon as it's approved, or if we need anything else from you.",
       ],
       button: { label: "View your stay", url: stayUrl },
     });
@@ -231,7 +332,7 @@ async function send(e: Email, key: string) {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: fromAddress(), to: [to], reply_to: LEGAL_ENTITY.email, subject: e.subject, html: e.html, text: e.text }),
+      body: JSON.stringify({ from: fromAddress(), to: [to], reply_to: LEGAL_ENTITY.email, subject: e.subject, html: e.html, text: e.text, ...(e.headers ? { headers: e.headers } : {}) }),
     });
     if (!res.ok) throw new Error(`Resend ${res.status}: ${(await res.text()).slice(0, 300)}`);
   }

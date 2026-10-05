@@ -48,6 +48,8 @@ import { Route as AuthenticatedDistributionSettingsRouteImport } from './routes/
 import { Route as AuthenticatedOnboardingAccommodationRouteImport } from './routes/_authenticated/onboarding/accommodation'
 import { Route as AuthenticatedOnboardingDistributionRouteImport } from './routes/_authenticated/onboarding/distribution'
 import { Route as AuthenticatedOnboardingRoleRouteImport } from './routes/_authenticated/onboarding/role'
+import { Route as ApiCronDailyRouteImport } from './routes/api/cron/daily'
+import { Route as ApiEmailUnsubscribeRouteImport } from './routes/api/email/unsubscribe'
 import { Route as AuthenticatedAccommodationAccommodationsIndexRouteImport } from './routes/_authenticated/accommodation/accommodations/index'
 import { Route as AuthenticatedAccommodationAccommodationsNewRouteImport } from './routes/_authenticated/accommodation/accommodations/new'
 import { Route as AuthenticatedDistributionOpportunitiesIdRouteImport } from './routes/_authenticated/distribution/opportunities.$id'
@@ -273,6 +275,16 @@ const AuthenticatedOnboardingRoleRoute =
     path: '/role',
     getParentRoute: () => AuthenticatedOnboardingRoute,
   } as any)
+const ApiCronDailyRoute = ApiCronDailyRouteImport.update({
+  id: '/api/cron/daily',
+  path: '/api/cron/daily',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEmailUnsubscribeRoute = ApiEmailUnsubscribeRouteImport.update({
+  id: '/api/email/unsubscribe',
+  path: '/api/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAccommodationAccommodationsIndexRoute =
   AuthenticatedAccommodationAccommodationsIndexRouteImport.update({
     id: '/accommodations/',
@@ -346,6 +358,8 @@ export interface FileRoutesByFullPath {
   '/onboarding/accommodation': typeof AuthenticatedOnboardingAccommodationRoute
   '/onboarding/distribution': typeof AuthenticatedOnboardingDistributionRoute
   '/onboarding/role': typeof AuthenticatedOnboardingRoleRoute
+  '/api/cron/daily': typeof ApiCronDailyRoute
+  '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/accommodation/': typeof AuthenticatedAccommodationIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/distribution/': typeof AuthenticatedDistributionIndexRoute
@@ -389,6 +403,8 @@ export interface FileRoutesByTo {
   '/onboarding/accommodation': typeof AuthenticatedOnboardingAccommodationRoute
   '/onboarding/distribution': typeof AuthenticatedOnboardingDistributionRoute
   '/onboarding/role': typeof AuthenticatedOnboardingRoleRoute
+  '/api/cron/daily': typeof ApiCronDailyRoute
+  '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/accommodation': typeof AuthenticatedAccommodationIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/distribution': typeof AuthenticatedDistributionIndexRoute
@@ -437,6 +453,8 @@ export interface FileRoutesById {
   '/_authenticated/onboarding/accommodation': typeof AuthenticatedOnboardingAccommodationRoute
   '/_authenticated/onboarding/distribution': typeof AuthenticatedOnboardingDistributionRoute
   '/_authenticated/onboarding/role': typeof AuthenticatedOnboardingRoleRoute
+  '/api/cron/daily': typeof ApiCronDailyRoute
+  '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/_authenticated/accommodation/': typeof AuthenticatedAccommodationIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/distribution/': typeof AuthenticatedDistributionIndexRoute
@@ -485,6 +503,8 @@ export interface FileRouteTypes {
     | '/onboarding/accommodation'
     | '/onboarding/distribution'
     | '/onboarding/role'
+    | '/api/cron/daily'
+    | '/api/email/unsubscribe'
     | '/accommodation/'
     | '/admin/'
     | '/distribution/'
@@ -528,6 +548,8 @@ export interface FileRouteTypes {
     | '/onboarding/accommodation'
     | '/onboarding/distribution'
     | '/onboarding/role'
+    | '/api/cron/daily'
+    | '/api/email/unsubscribe'
     | '/accommodation'
     | '/admin'
     | '/distribution'
@@ -575,6 +597,8 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding/accommodation'
     | '/_authenticated/onboarding/distribution'
     | '/_authenticated/onboarding/role'
+    | '/api/cron/daily'
+    | '/api/email/unsubscribe'
     | '/_authenticated/accommodation/'
     | '/_authenticated/admin/'
     | '/_authenticated/distribution/'
@@ -596,6 +620,8 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   DemoLinkCodeRoute: typeof DemoLinkCodeRoute
   GoCodeRoute: typeof GoCodeRoute
+  ApiCronDailyRoute: typeof ApiCronDailyRoute
+  ApiEmailUnsubscribeRoute: typeof ApiEmailUnsubscribeRoute
   ApiOpportunitiesIdPhotosZipRoute: typeof ApiOpportunitiesIdPhotosZipRoute
 }
 
@@ -874,6 +900,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRoleRouteImport
       parentRoute: typeof AuthenticatedOnboardingRoute
     }
+    '/api/cron/daily': {
+      id: '/api/cron/daily'
+      path: '/api/cron/daily'
+      fullPath: '/api/cron/daily'
+      preLoaderRoute: typeof ApiCronDailyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/email/unsubscribe': {
+      id: '/api/email/unsubscribe'
+      path: '/api/email/unsubscribe'
+      fullPath: '/api/email/unsubscribe'
+      preLoaderRoute: typeof ApiEmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/accommodation/accommodations/': {
       id: '/_authenticated/accommodation/accommodations/'
       path: '/accommodations'
@@ -1068,6 +1108,8 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   DemoLinkCodeRoute: DemoLinkCodeRoute,
   GoCodeRoute: GoCodeRoute,
+  ApiCronDailyRoute: ApiCronDailyRoute,
+  ApiEmailUnsubscribeRoute: ApiEmailUnsubscribeRoute,
   ApiOpportunitiesIdPhotosZipRoute: ApiOpportunitiesIdPhotosZipRoute,
 }
 export const routeTree = rootRouteImport
