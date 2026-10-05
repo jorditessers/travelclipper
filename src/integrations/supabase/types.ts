@@ -743,6 +743,24 @@ export type Database = {
         }
         Relationships: []
       }
+      email_preferences: {
+        Row: {
+          tips_opted_out_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          tips_opted_out_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          tips_opted_out_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       legal_acceptances: {
         Row: {
           accepted_at: string
@@ -972,6 +990,10 @@ export type Database = {
       accommodation_submission_blockers: {
         Args: { _accommodation_id: string }
         Returns: string[]
+      }
+      enqueue_tip_emails: {
+        Args: never
+        Returns: number
       }
       claim_email_outbox: {
         Args: { _limit?: number }
