@@ -10,6 +10,7 @@ import { ExcludeDemoToggle, NoteDialog, fmtDate } from "@/components/admin/share
 import { ACCOMMODATION_STATUS_LABEL, accommodationTypeLabel, type AccommodationStatus } from "@/lib/constants";
 import { friendlyError } from "@/lib/errors";
 import { isLocalDemo } from "@/integrations/demo-backend/mode";
+import { sendQueuedEmails } from "@/lib/email.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/accommodations")({
   head: () => ({
@@ -52,7 +53,7 @@ function Page() {
       const { error } = await supabase.rpc("admin_set_accommodation_status", { _accommodation_id: v.id, _status: v.status, _note: v.note });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Status updated and logged"); qc.invalidateQueries({ queryKey: ["admin-accommodations"] }); },
+    onSuccess: () => { toast.success("Status updated and logged"); qc.invalidateQueries({ queryKey: ["admin-accommodations"] }); sendQueuedEmails(); },
     onError: (e) => toast.error(friendlyError(e)),
   });
 

@@ -13,6 +13,7 @@ import { accessQuery, homeFor } from "@/lib/access";
 import { cn } from "@/lib/utils";
 import { loadOnboardingDraft, saveOnboardingDraft } from "@/lib/onboarding-draft";
 import type { AccommodationCountBand as CountBand, ApBusinessType as BusinessType, ApGoal as Goal } from "@/lib/constants";
+import { sendQueuedEmails } from "@/lib/email.functions";
 
 export const Route = createFileRoute("/_authenticated/onboarding/accommodation")({
   head: () => ({
@@ -123,6 +124,7 @@ function Page() {
     },
     onSuccess: () => {
       sessionStorage.removeItem(STORE);
+      sendQueuedEmails();
       setDone(true);
       toast.success("Onboarding complete");
     },

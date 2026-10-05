@@ -9,6 +9,7 @@ import { isLocalDemo } from "@/integrations/demo-backend/mode";
 import { enterDemo } from "@/lib/demo";
 import { Card, Skeleton } from "@/components/app/ui-kit";
 import type { Accommodation } from "@/lib/constants";
+import { sendQueuedEmails } from "@/lib/email.functions";
 
 const LABELS: Record<string, string> = {
   details: "Complete all required details",
@@ -37,7 +38,7 @@ export function PublishPanel({ accommodation: a }: { accommodation: Accommodatio
       const { error } = await supabase.rpc("submit_accommodation_for_review", { _accommodation_id: a.id });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Submitted for review"); refresh(); },
+    onSuccess: () => { toast.success("Submitted for review"); refresh(); sendQueuedEmails(); },
     onError: (e: Error) => toast.error(friendlyError(e)),
   });
   const setStatus = useMutation({

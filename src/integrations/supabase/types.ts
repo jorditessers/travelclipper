@@ -701,6 +701,45 @@ export type Database = {
         }
         Relationships: []
       }
+      email_outbox: {
+        Row: {
+          accommodation_id: string | null
+          attempts: number
+          claimed_at: string | null
+          created_at: string
+          id: string
+          kind: string
+          last_error: string | null
+          note: string | null
+          sent_at: string | null
+          user_id: string
+        }
+        Insert: {
+          accommodation_id?: string | null
+          attempts?: number
+          claimed_at?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          last_error?: string | null
+          note?: string | null
+          sent_at?: string | null
+          user_id: string
+        }
+        Update: {
+          accommodation_id?: string | null
+          attempts?: number
+          claimed_at?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          last_error?: string | null
+          note?: string | null
+          sent_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       legal_acceptances: {
         Row: {
           accepted_at: string
@@ -930,6 +969,10 @@ export type Database = {
       accommodation_submission_blockers: {
         Args: { _accommodation_id: string }
         Returns: string[]
+      }
+      claim_email_outbox: {
+        Args: { _limit?: number }
+        Returns: Database["public"]["Tables"]["email_outbox"]["Row"][]
       }
       admin_correct_booking: {
         Args: {
