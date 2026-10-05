@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader, SiteFooter } from "@/components/site/SiteHeader";
 import { GlassCard, Eyebrow, EarnBadge } from "@/components/site/Primitives";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import heroVilla from "@/assets/hero-villa.jpg";
 import stayCasaLumen from "@/assets/stay-casa-lumen.jpg";
 import stayLoftFig from "@/assets/stay-loft-fig.jpg";
@@ -23,31 +25,57 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const STAYS = [
+const FILTERS = [
+  { value: "all", label: "All" },
+  { value: "wellness", label: "Wellness" },
+  { value: "design", label: "Design" },
+  { value: "food", label: "Food & wine" },
+] as const;
+type Filter = (typeof FILTERS)[number]["value"];
+
+type Stay = {
+  name: string; meta: string; copy: string; details: string; pool: number; img: string; tags: Filter[];
+};
+
+// Example stays on the public homepage. Partners share 70% of the commission pool; the platform keeps 30%.
+const STAYS: Stay[] = [
   {
     name: "Casa Lumen",
     meta: "Alentejo · Wellness · Sustainable",
     copy: "Adults-only stone retreat with thermal pools and a farm-to-table kitchen.",
-    earn: 8,
+    details: "Eight suites in a restored farmhouse among cork oaks. Guests start the day in the thermal pools and end it at a long table with produce from the estate's own garden and local Alentejo wines.",
+    pool: 12,
     img: stayCasaLumen,
+    tags: ["wellness", "food"],
   },
   {
     name: "The Loft & Fig",
     meta: "Lisbon · Design · City",
     copy: "Twelve architect-designed suites above a neighbourhood bakery and wine bar.",
-    earn: 6,
+    details: "Light-filled suites with local ceramics and handmade furniture in a quiet Lisbon street. Breakfast comes from the bakery downstairs; in the evening the wine bar pours natural wines from small Portuguese producers.",
+    pool: 8,
     img: stayLoftFig,
+    tags: ["design", "food"],
   },
   {
     name: "Villa Marés",
     meta: "Costa Brava · Boutique · Couples",
     copy: "Whitewashed villa with a sea-facing plunge pool and private chef on request.",
-    earn: 7,
+    details: "A clean-lined villa above a small cove, made for couples. The plunge pool faces the sea, the spa treatments happen on the terrace and a private chef can cook Catalan dishes on request.",
+    pool: 10,
     img: stayVillaMares,
+    tags: ["design", "wellness"],
   },
 ];
 
+const round1 = (n: number) => Math.round(n * 10) / 10;
+const shareOf = (pool: number) => round1(pool * 0.7);
+
 function Index() {
+  const [filter, setFilter] = useState<Filter>("all");
+  const [open, setOpen] = useState<Stay | null>(null);
+  const shown = STAYS.filter((s) => filter === "all" || s.tags.includes(filter));
+  const villaMares = STAYS.find((s) => s.name === "Villa Marés")!;
   return (
     <div className="min-h-screen bg-cream text-ink">
       <SiteHeader />
@@ -91,13 +119,15 @@ function Index() {
                   </div>
                   <EarnBadge pct={7} className="px-3 py-1" />
                 </div>
-                <img
-                  src={heroVilla}
-                  alt="Golden-hour terrace of a whitewashed villa overlooking the Mediterranean"
-                  width={1200}
-                  height={800}
-                  className="mt-5 aspect-[3/2] w-full rounded-2xl object-cover"
-                />
+                <button type="button" onClick={() => setOpen(villaMares)} className="mt-5 block w-full" aria-label="View Villa Marés">
+                  <img
+                    src={heroVilla}
+                    alt="Golden-hour terrace of a whitewashed villa overlooking the Mediterranean"
+                    width={1200}
+                    height={800}
+                    className="aspect-[3/2] w-full rounded-2xl object-cover"
+                  />
+                </button>
                 <div className="mt-5 grid grid-cols-3 gap-3 text-center">
                   {[
                     ["10%", "Pool"],
@@ -110,8 +140,8 @@ function Index() {
                     </div>
                   ))}
                 </div>
-                <Button className="mt-5 w-full" size="sm" disabled>
-                  Create tracking link
+                <Button asChild className="mt-5 w-full" size="sm">
+                  <Link to="/auth" search={{ role: "distribution_partner" }}>Create tracking link</Link>
                 </Button>
               </GlassCard>
             </div>
@@ -138,17 +168,20 @@ function Index() {
                 Stays your audience will actually book
               </h2>
             </div>
-            <div className="flex gap-2">
-              <Button size="sm">All</Button>
-              <Button size="sm" variant="outline">Wellness</Button>
-              <Button size="sm" variant="outline">Design</Button>
-              <Button size="sm" variant="outline">Food & wine</Button>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Filter stays">
+              {FILTERS.map((f) => (
+                <Button key={f.value} size="sm" variant={filter === f.value ? "default" : "outline"}
+                  aria-pressed={filter === f.value} onClick={() => setFilter(f.value)}>
+                  {f.label}
+                </Button>
+              ))}
             </div>
           </div>
 
           <div className="mt-8 grid gap-6 md:grid-cols-3">
-            {STAYS.map((s) => (
-              <GlassCard key={s.name} className="p-3">
+            {shown.map((s) => (
+              <GlassCard key={s.name} className="p-3 transition hover:-translate-y-0.5">
+                <button type="button" onClick={() => setOpen(s)} className="block w-full text-left" aria-label={`View ${s.name}`}>
                 <img
                   src={s.img}
                   alt={s.name}
@@ -160,11 +193,13 @@ function Index() {
                 <div className="px-2 py-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-display text-xl">{s.name}</h3>
-                    <EarnBadge pct={s.earn} />
+                    <EarnBadge pct={shareOf(s.pool)} />
                   </div>
                   <p className="mt-1 text-[13px] text-ink/55">{s.meta}</p>
                   <p className="mt-3 text-[13px] leading-relaxed text-ink/65">{s.copy}</p>
+                  <p className="mt-4 text-[13px] font-medium text-moss">View stay →</p>
                 </div>
+                </button>
               </GlassCard>
             ))}
           </div>
@@ -182,7 +217,7 @@ function Index() {
             <div className="divide-y divide-paper/60">
               {[
                 ["LM", "Villa Marés · 4 nights", "Costa Brava · Booked 12 Jun", "+€294", "7% · confirmed", "moss"],
-                ["CL", "Casa Lumen · 3 nights", "Alentejo · Booked 04 Jun", "+€216", "8% · confirmed", "moss"],
+                ["CL", "Casa Lumen · 3 nights", "Alentejo · Booked 04 Jun", "+€216", "8.4% · confirmed", "moss"],
                 ["LF", "The Loft & Fig · 2 nights", "Lisbon · Booked 28 May", "€0", "pending · check-in", "clay"],
               ].map(([ini, title, sub, amt, note, tone]) => (
                 <div key={title} className="flex items-center justify-between gap-4 px-6 py-4">
@@ -215,6 +250,54 @@ function Index() {
         </section>
       </main>
       <SiteFooter />
+      <StayDialog stay={open} onClose={() => setOpen(null)} />
     </div>
+  );
+}
+
+function StayDialog({ stay, onClose }: { stay: Stay | null; onClose: () => void }) {
+  return (
+    <Dialog open={!!stay} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto bg-cream p-0 sm:max-w-lg">
+        {stay && (
+          <>
+            <img src={stay.img} alt={stay.name} className="aspect-[3/2] w-full object-cover sm:rounded-t-lg" />
+            <div className="space-y-5 p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <DialogTitle className="font-display text-3xl font-normal">{stay.name}</DialogTitle>
+                  <p className="mt-1 text-[13px] text-ink/55">{stay.meta}</p>
+                </div>
+                <EarnBadge pct={shareOf(stay.pool)} className="mt-2 px-3 py-1" />
+              </div>
+              <DialogDescription className="text-[14px] leading-relaxed text-ink/70">{stay.details}</DialogDescription>
+              <div className="grid grid-cols-3 gap-3 text-center">
+                {[
+                  [`${stay.pool}%`, "Commission pool"],
+                  [`${shareOf(stay.pool)}%`, "Your share"],
+                  [`${round1(stay.pool - shareOf(stay.pool))}%`, "Platform"],
+                ].map(([v, l]) => (
+                  <div key={l} className="rounded-xl border border-ink/10 bg-paper/50 px-2 py-3">
+                    <p className="font-display text-xl">{v}</p>
+                    <p className="text-[10px] uppercase tracking-wider text-ink/45">{l}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[12px] text-ink/50">
+                Example stay. Create a free distribution partner account to see all live stays and get your own tracking link.
+              </p>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button asChild className="flex-1">
+                  <Link to="/auth" search={{ role: "distribution_partner" }}>Create tracking link</Link>
+                </Button>
+                <Button asChild variant="outline" className="flex-1">
+                  <Link to="/auth" search={{ role: "accommodation_partner" }}>List your own stay</Link>
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
