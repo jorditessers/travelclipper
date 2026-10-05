@@ -10,6 +10,7 @@ import { Card, EmptyState, PageHeader, Skeleton } from "@/components/app/ui-kit"
 import { ASSET_BUCKET, SIGNED_URL_TTL } from "@/lib/assets";
 import { accommodationTypeLabel, marketLabel } from "@/lib/constants";
 import { isLocalDemo } from "@/integrations/demo-backend/mode";
+import { sendQueuedEmails } from "@/lib/email.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/review")({
   head: () => ({
@@ -78,7 +79,7 @@ function ReviewItem({ a }: { a: any }) {
       if (error) throw error;
       return approve;
     },
-    onSuccess: (ok) => { toast.success(ok ? "Approved — now active" : "Rejected — returned to draft"); qc.invalidateQueries({ queryKey: ["review-queue"] }); },
+    onSuccess: (ok) => { toast.success(ok ? "Approved — now active" : "Rejected — returned to draft"); qc.invalidateQueries({ queryKey: ["review-queue"] }); sendQueuedEmails(); },
     onError: (e: Error) => toast.error(friendlyError(e)),
   });
   return (

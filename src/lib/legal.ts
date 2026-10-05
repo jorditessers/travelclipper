@@ -7,7 +7,7 @@ export const LEGAL_ENTITY = {
   coc: "", // KvK-nummer
   vat: "", // btw-nummer
   email: "holidayclippers@proton.me", // support, klachten en privacy
-  website: "https://travelclipper.vercel.app",
+  website: "https://www.holidayclippers.com",
   liabilityCap: "", // maximum aansprakelijkheid in euro, e.g. "10.000"
 };
 

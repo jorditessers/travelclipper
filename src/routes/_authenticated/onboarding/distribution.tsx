@@ -12,6 +12,7 @@ import { MARKETS, NICHES, REACH_BANDS, type DistributionType, type Niche, type R
 import { accessQuery, homeFor } from "@/lib/access";
 import { cn } from "@/lib/utils";
 import { loadOnboardingDraft, saveOnboardingDraft } from "@/lib/onboarding-draft";
+import { sendQueuedEmails } from "@/lib/email.functions";
 
 export const Route = createFileRoute("/_authenticated/onboarding/distribution")({
   head: () => ({
@@ -128,6 +129,7 @@ function Page() {
     },
     onSuccess: async () => {
       sessionStorage.removeItem(STORE);
+      sendQueuedEmails();
       await qc.invalidateQueries({ queryKey: accessQuery.queryKey });
       const a = await qc.fetchQuery(accessQuery);
       toast.success("Your partner profile is ready");
