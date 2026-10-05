@@ -8,7 +8,7 @@ export const LEGAL_ENTITY = {
   vat: "NL002383869B03", // btw-nummer
   email: "holidayclippers@proton.me", // support, klachten en privacy
   website: "https://www.holidayclippers.com",
-  liabilityCap: "", // maximum aansprakelijkheid in euro, e.g. "10.000"
+  liabilityCap: "10.000", // maximum aansprakelijkheid in euro, e.g. "10.000"
 };
 
 export type LegalLang = "en" | "nl";
