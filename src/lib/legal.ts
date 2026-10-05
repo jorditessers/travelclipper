@@ -2,10 +2,10 @@
 // Fill in the empty fields before going live; empty fields show as a visible [placeholder].
 export const LEGAL_ENTITY = {
   platformName: "Holiday Clippers",
-  legalName: "", // juridische bedrijfsnaam, e.g. "Holidayclippers B.V."
-  address: "", // vestigingsadres
-  coc: "", // KvK-nummer
-  vat: "", // btw-nummer
+  legalName: "Socialtrends", // juridische bedrijfsnaam, e.g. "Holidayclippers B.V."
+  address: "Zijlweg 133, 2015 BE Haarlem, the Netherlands", // vestigingsadres
+  coc: "71680098", // KvK-nummer
+  vat: "NL002383869B03", // btw-nummer
   email: "holidayclippers@proton.me", // support, klachten en privacy
   website: "https://www.holidayclippers.com",
   liabilityCap: "", // maximum aansprakelijkheid in euro, e.g. "10.000"

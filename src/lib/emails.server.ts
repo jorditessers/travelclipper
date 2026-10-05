@@ -94,6 +94,94 @@ async function buildEmails(row: OutboxRow): Promise<Email[]> {
     return out;
   }
 
+  if (row.kind === "payout_details_changed") {
+    push([u.email], "Your payout details were changed", {
+      heading: "Your bank details were changed",
+      paragraphs: [
+        hi,
+        "The bank account for your Holiday Clippers payouts was just changed. Future commission will be paid to the new account.",
+        "Was this you? Then there's nothing you need to do. If you didn't make this change, reply to this email straight away and change your password.",
+      ],
+      button: { label: "Check your settings", url: `${site}/distribution/settings` },
+    });
+    return out;
+  }
+
+  if (row.kind.startsWith("booking_")) {
+    const { data: b } = await supabaseAdmin.from("bookings")
+      .select("id, accommodation_id, partner_id, check_in, check_out, guests, booking_value, partner_commission, accommodations(name, currency, owner_id)")
+      .eq("id", row.booking_id ?? "").maybeSingle();
+    if (!b) throw new Error("Booking not found");
+    const stay = (b.accommodations as { name: string; currency: string } | null) ?? { name: "your stay", currency: "EUR" };
+    const money = (n: number | null) =>
+      n == null ? "—" : new Intl.NumberFormat("en-GB", { style: "currency", currency: stay.currency || "EUR" }).format(Number(n));
+    const date = (d: string) => new Date(`${d}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    const nights = Math.max(1, Math.round((Date.parse(b.check_out) - Date.parse(b.check_in)) / 86_400_000));
+    const summary = `${stay.name} · ${date(b.check_in)} – ${date(b.check_out)} (${nights} ${nights === 1 ? "night" : "nights"}, ${b.guests} ${b.guests === 1 ? "guest" : "guests"}) · booking value ${money(b.booking_value)}`;
+
+    if (row.kind === "booking_reported") {
+      const { data: dp } = await supabaseAdmin.from("distribution_partner_profiles").select("brand_name").eq("user_id", b.partner_id).maybeSingle();
+      const partner = dp?.brand_name ?? "A distribution partner";
+      push([u.email], `Please confirm a booking for ${stay.name}`, {
+        heading: "A booking is waiting for you",
+        paragraphs: [
+          hi,
+          `${partner} reported a booking that came in through their tracking link:`,
+          summary,
+          "Please check it against your reservations and confirm or reject it. Commission is only due on bookings you confirm.",
+        ],
+        button: { label: "Review the booking", url: `${site}/accommodation/bookings` },
+      });
+      const p = await userInfo(b.partner_id);
+      if (p.email) push([p.email], `Booking reported: ${stay.name}`, {
+        heading: "Thanks, we've passed it on",
+        paragraphs: [
+          p.firstName ? `Hi ${p.firstName},` : "Hi,",
+          "Your booking has been sent to the accommodation to confirm:",
+          summary,
+          "You'll get an email as soon as it's confirmed, with the commission you earn.",
+        ],
+        button: { label: "View your bookings", url: `${site}/distribution/bookings` },
+      });
+    } else if (row.kind === "booking_confirmed") {
+      push([u.email], `Booking confirmed: you earn ${money(b.partner_commission)}`, {
+        heading: "Your booking is confirmed",
+        paragraphs: [
+          hi,
+          `Great news: a booking through your link was confirmed.`,
+          summary,
+          `Your commission: ${money(b.partner_commission)}. It becomes final once the guests have checked out, and is paid out to the bank account in your settings.`,
+        ],
+        button: { label: "View your earnings", url: `${site}/distribution/bookings` },
+      });
+    } else if (row.kind === "booking_rejected") {
+      push([u.email], `Booking not confirmed: ${stay.name}`, {
+        heading: "This booking wasn't confirmed",
+        paragraphs: [
+          hi,
+          "The accommodation couldn't match this booking to a reservation:",
+          summary,
+          `Reason: ${row.note?.trim() || "no reason given"}`,
+          "Think this is a mistake? Reply to this email and we'll look into it with you.",
+        ],
+        button: { label: "View your bookings", url: `${site}/distribution/bookings` },
+      });
+    } else if (row.kind === "booking_cancelled") {
+      push([u.email], `Booking cancelled: ${stay.name}`, {
+        heading: "A booking was cancelled",
+        paragraphs: [
+          hi,
+          "This booking was cancelled, so no commission is due for it:",
+          summary,
+          ...(row.note?.trim() ? [`Reason: ${row.note.trim()}`] : []),
+          "Questions? Reply to this email and we'll help.",
+        ],
+        button: { label: "View your bookings", url: `${site}/distribution/bookings` },
+      });
+    }
+    return out;
+  }
+
   const { data: acc } = await supabaseAdmin.from("accommodations").select("id, name").eq("id", row.accommodation_id ?? "").maybeSingle();
   if (!acc) throw new Error("Accommodation not found");
   const stayUrl = `${site}/accommodation/accommodations/${acc.id}`;

@@ -705,6 +705,7 @@ export type Database = {
         Row: {
           accommodation_id: string | null
           attempts: number
+          booking_id: string | null
           claimed_at: string | null
           created_at: string
           id: string
@@ -717,6 +718,7 @@ export type Database = {
         Insert: {
           accommodation_id?: string | null
           attempts?: number
+          booking_id?: string | null
           claimed_at?: string | null
           created_at?: string
           id?: string
@@ -729,6 +731,7 @@ export type Database = {
         Update: {
           accommodation_id?: string | null
           attempts?: number
+          booking_id?: string | null
           claimed_at?: string | null
           created_at?: string
           id?: string
