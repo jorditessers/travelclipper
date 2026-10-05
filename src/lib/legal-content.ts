@@ -516,6 +516,10 @@ export const PRIVACY_BLOCKS_NL: LegalBlock[] = [
   "Deze partijen mogen gegevens uitsluitend verwerken overeenkomstig onze instructies en toepasselijke privacywetgeving. Gegevens kunnen daarnaast worden gedeeld wanneer dit wettelijk verplicht is of noodzakelijk is voor bescherming van onze rechten."
  ],
  [
+  "p",
+  "Wij maken op dit moment gebruik van: Supabase (database, inloggen en bestandsopslag, servers in de EU), Vercel (hosting van de website) en Resend (versturen van e-mails, servers in de EU)."
+ ],
+ [
   "h2",
   "6. Gegevens tussen platformgebruikers"
  ],
@@ -776,6 +780,7 @@ export const PRIVACY_BLOCKS: LegalBlock[] = [
   ["h2", "5. With whom do we share data?"],
   ["p", "We do not sell personal data. We may share data with service providers necessary for hosting/database, cloud storage, email, analytics, security, authentication, payments (if added) and technical support."],
   ["p", "These parties may only process data in accordance with our instructions and applicable privacy law. Data may also be shared where required by law or necessary to protect our rights."],
+  ["p", "We currently use: Supabase (database, authentication and file storage, servers in the EU), Vercel (website hosting) and Resend (sending emails, servers in the EU)."],
   ["h2", "6. Data between platform users"],
   ["p", "For the Platform to work, business profile data and relevant accommodation or distribution data may be visible to other registered users. We limit this data to what is reasonably necessary for collaboration and distribution."],
   ["p", "Users may not use personal data obtained through the Platform for purposes other than those for which it was made available."],

@@ -9,6 +9,7 @@ import { Field, NativeSelect, TextInput } from "@/components/app/ui-kit";
 import { StayFieldsForm, checkStay, emptyStay, type StayFields } from "@/components/bookings/shared";
 import { distributionTypeLabel } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { sendQueuedEmails } from "@/lib/email.functions";
 
 const CODE_RE = /^[A-Z]{3}-[A-Z0-9]{5}$/;
 
@@ -68,6 +69,7 @@ export function RegisterBookingDialog({ trigger }: { trigger: ReactNode }) {
         _traveler_reference: f.traveler, _notes: f.notes, _booking_date: bookingDate,
       });
       if (error) throw error;
+      sendQueuedEmails();
     },
     onSuccess: () => {
       toast.success("Booking registered and confirmed");

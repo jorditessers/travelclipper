@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge, Field, NativeSelect, TextInput } from "@/components/app/ui-kit";
+import { sendQueuedEmails } from "@/lib/email.functions";
 
 export type BookingStatus = "reported" | "confirmed" | "completed" | "cancelled" | "rejected";
 
@@ -90,6 +91,7 @@ export function ReportBookingDialog({ accommodationId, trigger }: { accommodatio
         _booking_value: Number(f.value), _traveler_reference: f.traveler, _notes: f.notes,
       });
       if (error) throw error;
+      sendQueuedEmails();
     },
     onSuccess: () => {
       toast.success("Booking reported — the property will review it");

@@ -10,6 +10,7 @@ import {
 import { friendlyError } from "@/lib/errors";
 import { cn } from "@/lib/utils";
 import { SettingsSection, mySettingsKey } from "./shared";
+import { sendQueuedEmails } from "@/lib/email.functions";
 
 type Role = "accommodation_partner" | "distribution_partner";
 
@@ -89,6 +90,7 @@ export function BillingSection({ role, billing, readOnly }: { role: Role; billin
         _iban: f.iban.trim() ? normalizeIban(f.iban) : null,
       });
       if (error) throw error;
+      sendQueuedEmails();
     },
     onSuccess: () => {
       toast.success(`${copy.title} saved`);

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, DataTable, EmptyState, Field, PageHeader, Skeleton, TextInput } from "@/components/app/ui-kit";
 import { BookingStatusBadge, eur, fmtDay, stayRange, type BookingStatus } from "@/components/bookings/shared";
 import { RegisterBookingDialog } from "@/components/bookings/RegisterBookingDialog";
+import { sendQueuedEmails } from "@/lib/email.functions";
 
 export const Route = createFileRoute("/_authenticated/accommodation/bookings")({
   head: () => ({
@@ -108,6 +109,7 @@ function ReviewCard({ b }: { b: Row }) {
       if (!confirm && reason.trim().length < 3) throw new Error("A reason is required.");
       const { error } = await supabase.rpc("review_booking", { _booking_id: b.id, _confirm: confirm, _final_value: Number(value), _reason: reason });
       if (error) throw error;
+      sendQueuedEmails();
       return confirm;
     },
     onSuccess: (c) => { toast.success(c ? "Booking confirmed" : "Booking rejected"); qc.invalidateQueries({ queryKey: ["owner-bookings"] }); },
@@ -157,6 +159,7 @@ function CancelButton({ id }: { id: string }) {
     mutationFn: async (reason: string) => {
       const { error } = await supabase.rpc("cancel_booking", { _booking_id: id, _reason: reason });
       if (error) throw error;
+      sendQueuedEmails();
     },
     onSuccess: () => { toast.success("Booking cancelled"); qc.invalidateQueries({ queryKey: ["owner-bookings"] }); },
     onError: (e: Error) => toast.error(friendlyError(e)),

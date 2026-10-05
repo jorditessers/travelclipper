@@ -12,6 +12,7 @@ import { friendlyError } from "@/lib/errors";
 import type { BillingDetails } from "@/lib/billing";
 import type { Database } from "@/integrations/supabase/types";
 import { isLocalDemo } from "@/integrations/demo-backend/mode";
+import { sendQueuedEmails } from "@/lib/email.functions";
 
 type BookingStatus = Database["public"]["Enums"]["booking_status"];
 
@@ -73,6 +74,7 @@ function Page() {
     mutationFn: async (v: { id: string; status: BookingStatus; value: number | null; note: string }) => {
       const { error } = await supabase.rpc("admin_correct_booking", { _booking_id: v.id, _status: v.status, _booking_value: v.value as number, _note: v.note });
       if (error) throw error;
+      sendQueuedEmails();
     },
     onSuccess: () => { toast.success("Booking corrected and logged"); qc.invalidateQueries({ queryKey: ["admin-bookings"] }); },
     onError: (e) => toast.error(friendlyError(e)),
