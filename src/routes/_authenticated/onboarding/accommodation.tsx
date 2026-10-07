@@ -99,7 +99,9 @@ function Page() {
     });
   }, []);
   useEffect(() => {
-    if (!done) sessionStorage.setItem(STORE, JSON.stringify({ f, step }));
+    // Never overwrite saved progress with the blank starting state before it's restored.
+    if (done || (step === 0 && JSON.stringify(f) === JSON.stringify(EMPTY))) return;
+    sessionStorage.setItem(STORE, JSON.stringify({ f, step }));
   }, [f, step, done]);
 
   const m = useMutation({
