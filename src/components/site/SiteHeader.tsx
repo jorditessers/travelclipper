@@ -38,9 +38,9 @@ export function SiteHeader() {
             </Link>
           ) : (
             <>
-              <span>Inventory</span>
-              <span>Distribution</span>
-              <span>Attribution</span>
+              <Link to="/how-it-works" hash="accommodations" className="transition hover:text-ink">For accommodations</Link>
+              <Link to="/how-it-works" hash="partners" className="transition hover:text-ink">For creators</Link>
+              <Link to="/how-it-works" hash="faq" className="transition hover:text-ink">FAQ</Link>
             </>
           )}
         </nav>
@@ -62,9 +62,12 @@ export function SiteHeader() {
               Sign out
             </Button>
           ) : (
-            <Button asChild size="sm">
-              <Link to="/auth">Sign in</Link>
-            </Button>
+            <>
+              {!loading && <Link to="/how-it-works" className="text-[13px] text-ink/60 hover:text-ink md:hidden">How it works</Link>}
+              <Button asChild size="sm">
+                <Link to="/auth">Sign in</Link>
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -80,6 +83,8 @@ export function SiteFooter() {
           Holiday Clippers — open distribution for independent travel
         </span>
         <nav className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <Link to="/how-it-works" className="hover:text-ink">How it works</Link>
+          <Link to="/how-it-works" hash="faq" className="hover:text-ink">FAQ</Link>
           <Link to="/terms" className="hover:text-ink">Terms and Conditions</Link>
           <Link to="/privacy" className="hover:text-ink">Privacy Statement</Link>
           <a href={`mailto:${LEGAL_ENTITY.email}`} className="hover:text-ink">{LEGAL_ENTITY.email}</a>

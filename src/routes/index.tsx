@@ -4,6 +4,8 @@ import { SiteHeader, SiteFooter } from "@/components/site/SiteHeader";
 import { GlassCard, Eyebrow, EarnBadge } from "@/components/site/Primitives";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { FaqList } from "@/components/site/FaqList";
+import { HOME_FAQ } from "@/lib/faq";
 import heroVilla from "@/assets/hero-villa.jpg";
 import stayCasaLumen from "@/assets/stay-casa-lumen.jpg";
 import stayLoftFig from "@/assets/stay-loft-fig.jpg";
@@ -203,6 +205,20 @@ function Index() {
               </GlassCard>
             ))}
           </div>
+        </section>
+
+        <section className="grid gap-10 pb-20 md:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <Eyebrow>FAQ</Eyebrow>
+            <h2 className="mt-2 font-display text-3xl md:text-4xl">Good to know</h2>
+            <p className="mt-4 max-w-sm text-[14px] leading-relaxed text-ink/60">
+              Free to join, guests book directly with the accommodation, and commission is only due on confirmed bookings.
+            </p>
+            <Button asChild variant="outline" className="mt-6">
+              <Link to="/how-it-works" hash="faq">All questions</Link>
+            </Button>
+          </div>
+          <FaqList items={HOME_FAQ} idPrefix="home" />
         </section>
 
         <section className="pb-20">

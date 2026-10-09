@@ -29,7 +29,7 @@ const COPY: Record<Role, { title: string; description: string; emailLabel: strin
   },
   distribution_partner: {
     title: "Payout details",
-    description: "We pay your earned commission to this account after the stay is completed. Only you and the platform team can see these details.",
+    description: "We pay your earned commission to this account once a month, for stays completed in the previous month. Only you and the platform team can see these details.",
     emailLabel: "Email for payout statements (optional, defaults to your login email)",
     missing: "Add your payout details so we can pay the commission you earn.",
   },
