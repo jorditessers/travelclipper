@@ -251,7 +251,7 @@ async function buildEmails(row: OutboxRow): Promise<Email[]> {
           hi,
           `Great news: a booking through your link was confirmed.`,
           summary,
-          `Your commission: ${money(b.partner_commission)}. It becomes final once the guests have checked out, and is paid out to the bank account in your settings.`,
+          `Your commission: ${money(b.partner_commission)}. It becomes final once the guests have checked out. We pay out once a month, for the stays completed in the previous month, to the bank account in your settings.`,
         ],
         button: { label: "View your earnings", url: `${site}/distribution/bookings` },
       });
