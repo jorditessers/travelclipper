@@ -32,16 +32,15 @@ export function SiteHeader() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Brand />
         <nav className="hidden items-center gap-8 text-[13px] text-ink/60 md:flex">
-          {user ? (
+          {/* Always visible, signed in or not, so everyone can find the explanation and the FAQ. */}
+          <Link to="/how-it-works" className="transition hover:text-ink" activeProps={{ className: "text-ink" }} activeOptions={{ includeHash: false }}>How it works</Link>
+          {!user && <Link to="/how-it-works" hash="accommodations" className="transition hover:text-ink">For accommodations</Link>}
+          {!user && <Link to="/how-it-works" hash="partners" className="transition hover:text-ink">For creators</Link>}
+          <Link to="/how-it-works" hash="faq" className="transition hover:text-ink">FAQ</Link>
+          {user && (
             <Link to="/dashboard" className="transition hover:text-ink" activeProps={{ className: "text-ink" }}>
               Dashboard
             </Link>
-          ) : (
-            <>
-              <Link to="/how-it-works" hash="accommodations" className="transition hover:text-ink">For accommodations</Link>
-              <Link to="/how-it-works" hash="partners" className="transition hover:text-ink">For creators</Link>
-              <Link to="/how-it-works" hash="faq" className="transition hover:text-ink">FAQ</Link>
-            </>
           )}
         </nav>
         <div className="flex items-center gap-3">
@@ -49,6 +48,9 @@ export function SiteHeader() {
             <span className="hidden items-center gap-2 rounded-full border border-ink/10 bg-paper/60 px-3 py-1.5 text-[12px] text-ink/70 sm:flex">
               <span className="size-1.5 rounded-full bg-moss" /> Signed in · {roleLabel}
             </span>
+          )}
+          {!loading && user && (
+            <Link to="/dashboard" className="text-[13px] text-ink/60 hover:text-ink md:hidden">Dashboard</Link>
           )}
           {!loading && user ? (
             <Button
