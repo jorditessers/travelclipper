@@ -44,8 +44,25 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+// Old addresses that should send visitors to the real domain. Preview deployments
+// (travelclipper-git-…vercel.app) are left alone so they stay testable.
+const CANONICAL_ORIGIN = "https://www.holidayclippers.com";
+const OLD_HOSTS = new Set(["travelclipper.vercel.app"]);
+
+function redirectOldHost(request: Request): Response | null {
+  const url = new URL(request.url);
+  const host = (request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? url.host).split(":")[0]!.toLowerCase();
+  if (!OLD_HOSTS.has(host)) return null;
+  return new Response(null, {
+    status: 308,
+    headers: { location: `${CANONICAL_ORIGIN}${url.pathname}${url.search}`, "cache-control": "public, max-age=3600" },
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const moved = redirectOldHost(request);
+    if (moved) return moved;
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
